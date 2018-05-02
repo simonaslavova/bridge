@@ -1,0 +1,32 @@
+html
+  head
+    link(href='/chatsstyle.css', rel='stylesheet', type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Alfa+Slab+One|Karma|Montserrat|Playfair+Display|Poiret+One|Raleway|Rozha+One|Sanchez', rel='stylesheet')
+    link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+  script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
+  body
+    header
+      img(src='/LogoBridge.jpg', width='90', height='90')
+      nav.links
+        ol
+          a(href='start.jade') Home
+          a(href='profile.jade') Profile
+          a(href='tagpage.jade') Tags
+          a(href='chats.jade') Chats
+    .main
+      br
+      br
+      .chatbox
+        .userChat
+          h3 Simona Slavova
+        #reciever
+          p jnfaiwnifnwiefbn
+        #sender
+          p jnfaiwnifnwiefbn
+        #reciever
+          p jnfaiwnifnwiefbn
+        #sender
+          p jnfaiwnifnwiefbn
+        div
+          button.Button(type='button', onclick='search()') Send
+          input#chatinput(type='text', name='chatinput')

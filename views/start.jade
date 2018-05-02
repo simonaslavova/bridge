@@ -1,0 +1,51 @@
+html
+  head
+    link(href='/startstyle.css', rel='stylesheet', type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+  body
+    #rightside
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      img(src='/LogoBridge.jpg', width='70', height='70')
+      #slogan
+        h1
+          | Find people that love
+          | the same thing as you do.
+        h2 Join Bridge today.
+      br
+      #getstarted
+        form(action='/users/start', method='post')
+          fieldset
+            label(for='name') Userame: 
+            input#name(type='text', name='name')
+            br
+            label(for='email') Email: 
+            input#email(type='email', name='email')
+            br
+            label(for='description') Password: 
+            input#pass(type='text', name='pass')
+            br
+            input(type='submit', value='create profile')
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      br

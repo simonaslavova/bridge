@@ -1,0 +1,80 @@
+html
+  head
+    link(href='/tagstyle.css', rel='stylesheet', type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Alfa+Slab+One|Karma|Montserrat|Playfair+Display|Poiret+One|Raleway|Rozha+One|Sanchez', rel='stylesheet')
+    link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+  script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
+  body
+    header
+      img(src='/LogoBridge.jpg', width='90', height='90')
+      nav.links
+        ol
+          a(href='start.jade') Home
+          a(href='profile.jade') Profile
+          a(href='tagpage.jade') Tags
+          a(href='chats.jade') Chats
+    .main
+      br
+      br
+      #tagpopup
+        #search
+          h1  Add/Create Tag 
+          button.Button(type='button', onclick='search()') ?
+          input#searchtag(type='text', name='searchtag')
+          #results
+            // make visible function only when there are results
+            h3 Results:
+            p
+              | tag_name()
+              button.Button(type='button', onclick='addTag()') +
+            p
+              | tag_name()
+              button.Button(type='button', onclick='addTag()') +
+            p
+              | tag_name()
+              button.Button(type='button', onclick='addTag()') +
+            p
+              | tag_name()
+              button.Button(type='button', onclick='addTag()') +
+        #alltags
+          h1  All Tags 
+          nav
+            ul
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+              li
+                a(href='#') tag_name()
+        br
+        br

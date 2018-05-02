@@ -1,0 +1,15 @@
+html
+  head
+  link(href='/tagstyle.css', rel='stylesheet', type='text/css')
+  link(href='https://fonts.googleapis.com/css?family=Alfa+Slab+One|Karma|Montserrat|Playfair+Display|Poiret+One|Raleway|Rozha+One|Sanchez', rel='stylesheet')
+  link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+  link(rel='stylesheet', href='/css/bootstrap-min.css')
+  body
+  header
+  img(src='/LogoBridge.jpg', width='90', height='90')
+  form(action='/users/submitTag', method='POST')
+      fieldset
+        label(for='Tname') Tag: 
+        input#Tname(type='text', name='Tname')
+        br
+        input(type='submit', value='create tag')

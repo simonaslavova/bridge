@@ -1,0 +1,26 @@
+html
+  head
+    title  test 
+link(rel='stylesheet', href='/css/bootstrap-min.css')
+link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+link(href='/tagstyle.css', rel='stylesheet', type='text/css')
+body
+header
+img(src='/LogoBridge.jpg', width='90', height='90')
+form(action='/users/createChat', method='POST')
+      fieldset
+        label(for='Cid') Title of the Chat:
+        input#Title(type='text', name='Title')
+        br
+        label(for='Cmessage') User you want to invite: 
+        input#User(type='text', name='InviteID')
+        br
+        input(type='submit', value='create chat')
+  script(src='api.js')
+    <script>
+    </html>
+
+
+
+
+
