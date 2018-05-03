@@ -1,41 +1,52 @@
-body{
-background: white;
-font-family: Quicksand;
+
+* {
+    box-sizing: border-box;
 }
 
-h1{
-font-size: 25px;
+html, body {
+    height: 100%;
 }
 
-h2{
-font-size: 20px;
+body {
+    background: white;
+    font-family: Quicksand;
+    margin: 0;
+    padding: 0;
 }
 
-#login{
-float : none;
-padding: 15px;
+h1 {
+    font-size: 25px;
 }
 
-#getstarted{
-text-align: right;
+h2 {
+    font-size: 20px;
 }
 
-#rightside{
+#login {
+    padding: 15px;
+}
+
+#getstarted {
+    text-align: right;
+}
+
+#rightside {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 	padding: 0px 20px 20px 20px;
-	margin:0px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin: 0px;
 	width : 25%;
 	height: 100%;
 	float : right;
 	background-color: orange;
 }
 
-#slogan{
+#slogan {
 	text-align: left;
 }
 
-.rounded{
+.rounded {
     border-radius: 15px 15px 15px 15px;
     background: white;
     padding: 15px; 

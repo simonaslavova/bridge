@@ -10,17 +10,17 @@ var app=express();
 
 app.use(express.static("node_modules/bootstrap/dist"));
 app.use(express.static("public"));
-
-var urlencodedParser = bodyParser.urlencoded({ extended: true });
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("views", "./views");
 app.set('view engine', 'jade');
 
 app.get('/', function (req,res) {
 	res.render("start", { title: "Home"});
-	});
+});
 
 var apiRouter = require("./api");
+
 app.use("/users", apiRouter);
 
 
