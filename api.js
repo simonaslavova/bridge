@@ -10,10 +10,10 @@ var idMaster;
 
 var con = mysql.createConnection({
 	host: "localhost",
-	port: "3306",
-	user: "web",
-	password: "web",
-	database: "web",
+	port: 3306,
+	user: "root",
+	password: "",
+	database: "Bridge",
 });
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -47,8 +47,8 @@ router.get('/submitTag',function(req,res){
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
- 		res.render('submitTag', {result: JSON.stringify(result)});
- 	});
+		res.render('submitTag', {result: JSON.stringify(result)});
+	});
 });
 
 
