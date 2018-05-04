@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-var BDB = require("./data/BDB");
 var bodyParser = require('body-parser');
 
 var router = express.Router();
@@ -12,20 +11,16 @@ var idMaster;
 var con = mysql.createConnection({
 	host: "localhost",
 	port: "3306",
-	user: "root",
-	password: "",
-	database: "Bridge",
+	user: "web",
+	password: "web",
+	database: "web",
 });
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-
-
 con.connect(function(err) {
 	if (err) throw err
 });
-
-
 
 router.get("/start", function(req,res){
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
@@ -37,8 +32,7 @@ router.get("/start", function(req,res){
 });
 
 
-router.post('/start',urlencodedParser, function(req, res, next) {
-
+router.post('/start', function(req, res, next) {
 	console.log("connected");
 	var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES ('"+req.body.name+"', '"+req.body.email+"', '"+req.body.pass+"')";
 	con.query(sql, function(err, result)  {
@@ -48,66 +42,47 @@ router.post('/start',urlencodedParser, function(req, res, next) {
 	res.redirect("/users/login");
 });
 
-// router.get("/start", function(req,res){
-// 		res.render('start');
-// 	});
 
 router.get('/submitTag',function(req,res){
-	//var taglist;
-
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
-		//taglist = result;
 		console.log(result);
-		//displayTags(taglist);
-		//console.log("idMaster" + idMaster);
-
-     //res.json(result);
-     //res.render('submitTag');
- });
- res.render('submitTag');
+ 		res.render('submitTag', {result: JSON.stringify(result)});
+ 	});
 });
 
 
-router.post('/submitTag',urlencodedParser, function(req, res, next) {
-	// con.connect( function(err) {
-	// 	if (err) throw  err;
-	console.log("connected");
-	var sql12 = "INSERT INTO `Tags`(`tag_name`) VALUES ('"+req.body.Tname+"')";
-	con.query(sql12, function(err, result)  {
+router.post('/submitTag', function(req, res) {
+	var q = "INSERT INTO `Tags`(`tag_name`, `category`) VALUES (?,?)";
+	var values = [req.body.Tname, req.body.Tcategory];
+	con.query(q, values, function(err, result) {
 		if(err) throw err;
 		console.log("tag submit");
-			//console.log(result);
-		});
+	});
 	res.redirect("/users/submitTag");
-
-	//});
-	//res.render('createTag', { title: 'Express' });
 });
 
 router.get("/login", function(req,res){
 	res.render('login');
 });
 
-router.post("/login",urlencodedParser, function(req,res){
+router.post("/login", function(req,res){
 	var username = req.body.username;
 	var password = req.body.pass;
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
-		var success=0;
-
+		var success = false;
 		for(var i =0; i<result.length; i++){
 			if(result[i].username == username && result[i].pass_word == password){
-				//res.redirect("/users/profile");
-				success=1;
+				success= true;
 				idMaster = result[i].id_user;
+				break;
 			}
 		}
-		if (success==1)
+		if (success)
 			res.redirect("/users/profile");
 		else
 			res.redirect("/users/login");
 	});
-	//res.redirect("/users/profile");
 });
 
 router.get("/profile", function(req,res){
@@ -175,7 +150,7 @@ router.get('/tagToUser',function(req,res){
 	});
 });
 
-router.post('/tagToUser',urlencodedParser, function(req, res, next) {
+router.post('/tagToUser', function(req, res, next) {
 	var sql5 = "INSERT INTO `taglist`(`id_tag`, `id_user`) VALUES ('"+req.body.Tid+"', '"+idMaster+"')";
 
 	con.query(sql5, function(err, result)  {
@@ -191,7 +166,7 @@ router.get('/messageToChat',function(req,res){
 	res.render('messageToChat');
 });
 
-router.post('/messageToChat',urlencodedParser, function(req, res, next) {
+router.post('/messageToChat', function(req, res, next) {
 	var sent= "sent";
 	var sql88 = "INSERT INTO `ChatMessage`(`id_chat`, `id_user`, `content`, `sender`, `state`) VALUES ('"+req.body.Cid+"', '"+idMaster+"', '"+req.body.Cmessage+"', '"+idMaster+"', '"+sent+"')";
 
@@ -213,7 +188,7 @@ router.get('/createChat',function(req,res){
 	res.render('createChat');
 });
 
-router.post('/createChat',urlencodedParser, function(req, res, next) {
+router.post('/createChat', function(req, res, next) {
 	var sq2 = "INSERT INTO `Chat`(`title`) VALUES ('"+req.body.Title+"')";
 
 	con.query(sq2, function(err, result)  {
@@ -228,7 +203,7 @@ router.get('/InviteToChat',function(req,res){
 	res.render('InviteToChat');
 });
 
-router.post('/InviteToChat',urlencodedParser, function(req, res, next) {
+router.post('/InviteToChat', function(req, res, next) {
 	var sq9 = "INSERT INTO `userChat`(`id_user`, `id_chat`) VALUES ('"+req.body.InviteID+"', '"+req.body.chatID+"')";
 
 	con.query(sq9, function(err, result)  {
