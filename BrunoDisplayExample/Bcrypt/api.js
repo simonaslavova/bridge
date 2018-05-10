@@ -48,8 +48,12 @@ router.post('/start',urlencodedParser, function(req, res, next) {
 
 		bcrypt.hash(hashedPass, saltRounds, function(err, hash){
 
-			var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES ('"+req.body.name+"', '"+req.body.email+"', '"+hash+"')";
-			con.query(sql, function(err, result)  {
+			//var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES ('"+req.body.name+"', '"+req.body.email+"', '"+hash+"')";
+
+			var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES (?, ?, ?)";
+			var vals = [req.body.name, req.body.email, hash];
+
+			con.query(sql, vals, function(err, result)  {
 				if(err) throw err;
 				console.log("table created");
 			});
@@ -64,26 +68,21 @@ router.post('/start',urlencodedParser, function(req, res, next) {
 router.get("/login", function(req,res){
 	res.render('login');
 });
-
+//use the "?" notation to circumvent security flaws, apply to rest of code later
 router.post("/login",urlencodedParser, function(req,res){
 	var username = req.body.username;
 	var password = req.body.pass;
-	con.query("SELECT * FROM `Users`", function (err, result, fields) {
-		var success=0;
-
-		for(var i =0; i<result.length; i++){
-			if(result[i].username == username && result[i].pass_word == password){
-				//res.redirect("/users/profile");
-				success=1;
-				idMaster = result[i].id_user;
-			}
+	let vals=[req.body.username];
+	con.query("SELECT * FROM `Users` WHERE `username`=?", vals, function (err, result, fields) {
+		if(result.length>0){
+			if (bcrypt.compareSync(password, result[0].pass_word))
+				res.redirect("/users/profile");
+			else
+				res.redirect("/users/login");
 		}
-		if (success==1)
-			res.redirect("/users/profile");
 		else
 			res.redirect("/users/login");
 	});
-	//res.redirect("/users/profile");
 });
 
 router.get("/profile", function(req,res){
@@ -284,17 +283,12 @@ function displayTags (taglist)
 	*/
 
 
-	router.get('/findChat',function(req,res){
+router.get('/findChat',function(req,res){
 
-		con.query("SELECT * FROM `taglist` WHERE `id_tag`='"+tagid+"' AND `id_user`!='"+idMaster+"'", function (err, result, fields) {
-			if (err) throw err;
-			console.log(result);
-			res.send(result);
-
-		});
-
+	con.query("SELECT * FROM `taglist` WHERE `id_tag`='"+tagid+"' AND `id_user`!='"+idMaster+"'", function (err, result, fields) {
+		if (err) throw err;
+		console.log(result);
+		res.send(result);
 
 	});
-
-
-
+});
