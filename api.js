@@ -33,7 +33,6 @@ router.get("/start", function(req,res){
 	res.render('start');
 });
 
-//START DOESNT WORK AFTER USING BCRYPT FOR SOME REASON
 router.post('/start',urlencodedParser, function(req, res, next) {
 	var hashedPass;
 	console.log("first");
@@ -66,7 +65,6 @@ router.get('/submitTag',function(req,res){
 		res.render('submitTag', {result: JSON.stringify(result)});
 	});
 });
-
 
 router.post('/submitTag', function(req, res) {
 	var q = "INSERT INTO `Tags`(`tag_name`, `category`) VALUES (?,?)";
