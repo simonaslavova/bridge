@@ -10,14 +10,17 @@ block content
             h2 Join Bridge today.
         #getstarted
             form(action='/users/start', method='post')
-            fieldset
-                label(for='name') Userame: 
-                input#name(type='text', name='name')
-                br
-                label(for='email') Email: 
-                input#email(type='email', name='email')
-                br
-                label(for='description') Password: 
-                input#pass(type='text', name='pass')
-                br
-                input(type='submit', value='create profile')
+                fieldset
+                    label(for='name') Username: 
+                    input#name(type='text', name='name')
+                    br
+                    label(for='email') Email: 
+                    input#email(type='email', name='email')
+                    br
+                    label(for='description') Password: 
+                    input#pass(type='text', name='pass')
+                    br
+                    label(for='description') Password Confirm: 
+                    input#passC(type='text', name='passC')
+                    br
+                    input(type='submit', value='create profile')

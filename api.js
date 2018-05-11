@@ -2,11 +2,14 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
 
 var router = express.Router();
 module.exports = router; 
 
 var idMaster;
+const saltRounds = 10;
+
 
 var con = mysql.createConnection({
 	host: "localhost",
@@ -27,19 +30,32 @@ router.get("/start", function(req,res){
 		if (err) throw err;
 		console.log(result);
 	});
-
 	res.render('start');
 });
 
+//START DOESNT WORK AFTER USING BCRYPT FOR SOME REASON
+router.post('/start',urlencodedParser, function(req, res, next) {
+	var hashedPass;
+	console.log("first");
 
-router.post('/start', function(req, res, next) {
-	console.log("connected");
-	var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES ('"+req.body.name+"', '"+req.body.email+"', '"+req.body.pass+"')";
-	con.query(sql, function(err, result)  {
-		if(err) throw err;
-		console.log("table created");
-	});
-	res.redirect("/users/login");
+	if(req.body.pass==req.body.passC && req.body.name!="" && req.body.email!=""){
+		hashedPass=req.body.pass;
+		console.log("second");
+
+		bcrypt.hash(hashedPass, saltRounds, function(err, hash){
+
+			var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES (?, ?, ?)";
+			var vals = [req.body.name, req.body.email, hash];
+
+			con.query(sql, vals, function(err, result)  {
+				if(err) throw err;
+				console.log("user created");
+			});
+		});
+		res.redirect("/users/login");
+	}
+	else
+		res.redirect("/users/start");
 });
 
 
@@ -66,20 +82,17 @@ router.get("/login", function(req,res){
 	res.render('login');
 });
 
-router.post("/login", function(req,res){
+router.post("/login",urlencodedParser, function(req,res){
 	var username = req.body.username;
 	var password = req.body.pass;
-	con.query("SELECT * FROM `Users`", function (err, result, fields) {
-		var success = false;
-		for(var i =0; i<result.length; i++){
-			if(result[i].username == username && result[i].pass_word == password){
-				success= true;
-				idMaster = result[i].id_user;
-				break;
-			}
+	let vals=[req.body.username];
+	con.query("SELECT * FROM `Users` WHERE `username`=?", vals, function (err, result, fields) {
+		if(result.length>0){
+			if (bcrypt.compareSync(password, result[0].pass_word))
+				res.redirect("/users/profile");
+			else
+				res.redirect("/users/login");
 		}
-		if (success)
-			res.redirect("/users/profile");
 		else
 			res.redirect("/users/login");
 	});
