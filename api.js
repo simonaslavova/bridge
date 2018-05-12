@@ -57,7 +57,6 @@ router.post('/start',urlencodedParser, function(req, res, next) {
 		res.redirect("/users/start");
 });
 
-
 router.get('/submitTag',function(req,res){
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
@@ -108,47 +107,7 @@ router.get("/profile", function(req,res){
 		if (err) throw err;
 		console.log(result);
 	});
-
-	//finds the tag associated with the logged in user in the "taglist" intermediate table and then gets the tag name from the "tags" table
-	//DOESNT WORK IF USER DOESNT HAVE TAGS ON LOGIN
-	// con.query("SELECT * FROM `taglist` WHERE `id_user`='"+idMaster+"'", function (err, result, fields) {
-	// 	if (err) throw err;
-	// 	if(result!=null)
-	// 	{
-	// 		console.log(result);
-	// 		tagID=result[0].id_tag;
-	// 		con.query("SELECT `tag_name` FROM `tags` WHERE `id_tag`='"+tagID+"'", function (err, result, fields){
-	// 			if (err) throw err;
-	// 			console.log(result);
-	// 		});
-	// 	}
-	// });
-
-	// //create query to find all of the users friends. FIND WAY TO MAKE FRIENDLIST AN ARRAY WHERE IT STORES FRIEND ID AND FRIEND NAME, MAYBE CHANGE DATABSE
-	// con.query("SELECT * FROM `friendlist` WHERE `id_user`= '"+idMaster+"'", function (err, result, fields) {
-	// 	if (err) throw err;
-	// 	if(result!=null)
-	// 	{
-	// 		for(z=0;z<result.length;z++)
-	// 			userFriends.push(result[z].id_friend);
-	// 		console.log(userFriends);
-
-	// 		for(z=0;z<userFriends.length;z++)
-	// 		{
-	// 			con.query("SELECT `username` FROM `users` WHERE `id_user`='"+userFriends[z]+"'", function (err, result, fields){
-	// 				if (err) throw err;
-	// 				console.log(result);
-	// 			});
-	// 		}
-
-	// 	}
-	//});
-
-
-	//create query to find all chats the user is in and inside who each person inside that chat is
-
 });
-
 
 
 //SHOULD UPLOAD TO TAGLIST CURRENT LOGGED IN USER AND THE INPUT OF WHATVER TAG ID WE PUT IN		
@@ -224,20 +183,6 @@ router.post('/InviteToChat', function(req, res, next) {
 	res.redirect("/users/InviteToChat");
 });
 
-
-// router.get('/taglist', function(req,res){
-
-// 	con.query("SELECT * FROM ´Tags`", function (err, result, fields){
-// 		if (err) throw err;
-// 		console.log(result);
-// 		res.render(result);
-
-
-
-// 	});
-
-// });
-
 function displayTags (taglist)
 {
 	for(var z=0; z<taglist.length; z++)
@@ -247,48 +192,16 @@ function displayTags (taglist)
 	console.log("function working");
 }
 
-/*function find_chat_random (tagid)
-{
-	var match_list = [];
-	var t= 0;
-
-	con.query("SELECT * FROM `taglist` WHERE `id_tag`='"+tagid+"' AND `id_user`!='"+idMaster+"'", function (err, result, fields) {
-		if (err) throw err;
+app.get('/findRandomChat',(req,res)=>{
+	let sql = 'SELECT * FROM Users';
+	db.query(sql,(err,result)=>{
+		if(err)throw err;
 		console.log(result);
-		result = result[Math.floor(Math.random() * result.length)];
-		console.log(result);
+		res.send(result);
 
 	});
+});
 
-		for(var z=0; z < user_list.length; z++)//goes through each user
-		{
-			for(var y=0; y < user_list[z].tags.length; y++)//goes through each tag of the user
-			{
-				for(var x=0; x<tag_names.length; x++)
-				{
-					if(user_list[z].tags[y].name==tag_names[x])
-						t++;
-					//console.log("comparing tags to given list");
-				}
-				//console.log("each tag of each user");
-			}
-
-			if(t==tag_names.length)
-			{
-				match_list.push(user_list[z]);
-				console.log("match");
-			}
-			//console.log("user list loop");
-
-			t=0;
-		}
-		//console.log("full function");
-
-		var result = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
-		//setup chat with 'result'
-	}
-
-	*/
 
 
 
