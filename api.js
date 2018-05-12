@@ -2,14 +2,43 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
-var bcrypt = require('bcrypt');
 
+var idMaster;
 var router = express.Router();
 module.exports = router; 
 
-var idMaster;
+//Bcrypt
+var bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+//Pasport
+var cookieParser = require('cookie-parser')
+var session = require('express-session')
+var MySQLStore = require('express-mysql-session')(session);
+var passport = require('passport');
+var passport = require('passport')
+  , LocalStrategy = require('passport-local').Strategy;
+
+
+router.use(session({
+	secret: 'keyboard cat',
+	resave: false,
+	saveUnitialized: false ,
+	//cookie:{secure:true}
+}))
+router.use(cookieParser());
+router.use(passport.initialize());
+router.use(passport.session());
+
+const options = {
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "",
+  database: "Bridge",
+  //socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock"
+};
+var sessionStore = new MySQLStore(options);
 
 var con = mysql.createConnection({
 	host: "localhost",
@@ -25,36 +54,82 @@ con.connect(function(err) {
 	if (err) throw err
 });
 
+/*Local - for local database strategy
+router.post('/start', passport.authenticate('local', {
+
+successRedirect: 'users/login',
+failureRedirect: 'users/start'
+
+}));
+*/
+
+router.get('/users/login', authenticationMiddleware (), (req,res)=>{
+	
+//  deserializeUser ... if so - creates a session and returns a session key
+  console.log(req.user);
+  console.log(req.isAuthenticated());
+  res.redirect('/users/login');
+
+	});
+
+router.get("/profile", function(req,res){
+	con.query("SELECT * FROM `Users` WHERE `id_user`=id_user", function (err, result, fields) {
+		if (err) throw err;
+		console.log(result);
+	    res.render('profile',{result: JSON.stringify(result)});
+	});
+});
+
 router.get("/start", function(req,res){
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
+	    res.render('start',{result: JSON.stringify(result)});
 	});
-	res.render('start');
 });
 
-router.post('/start',urlencodedParser, function(req, res, next) {
-	var hashedPass;
-	console.log("first");
+router.post('/start',urlencodedParser, function(req, res) {
+	//var hashedPass;
+	//console.log("first");
+	//var name = req.body.name;
+    var pass = req.body.pass;
+    //var mail = req.body.mail;
 
 	if(req.body.pass==req.body.passC && req.body.name!="" && req.body.email!=""){
-		hashedPass=req.body.pass;
-		console.log("second");
+		//pass=req.body.pass;
+		//console.log("second");
+		
 
-		bcrypt.hash(hashedPass, saltRounds, function(err, hash){
+		bcrypt.hash(pass, saltRounds, function(err, hash){
 
-			var sql = "INSERT INTO `Users`(`username`, `email`, `pass_word`) VALUES (?, ?, ?)";
+			let sql = "INSERT INTO `Users`(`id_user`, `username`, `email`, `pass_word`) VALUES (NULL, ?, ?, ?)";
 			var vals = [req.body.name, req.body.email, hash];
 
 			con.query(sql, vals, function(err, result)  {
 				if(err) throw err;
-				console.log("user created");
-			});
-		});
+				//console.log("user created");
+				let sql = "SELECT LAST_INSERT_ID() as id_user";
+
+				con.query(sql,(err,result)=>{
+                  if(err)throw err;
+
+                  var id_user = result[0];
+                  console.log(result[0]);
+
+                  //LOGIN USER-create a session
+                     req.login(id_user,function(err){
+
+                     //res.redirect('/users/login');  
+
+                     });
+			     });
+		    });
 		res.redirect("/users/login");
+	    });
 	}
 	else
 		res.redirect("/users/start");
+	
 });
 
 
@@ -98,8 +173,8 @@ router.post("/login",urlencodedParser, function(req,res){
 
 router.get("/profile", function(req,res){
 	res.render('profile');
-	console.log(idMaster);
-	var tagID;
+	//console.log(idMaster);
+	//var tagID;
 	var userFriends=[];
 	var userFriendlist=[];
 
@@ -108,6 +183,7 @@ router.get("/profile", function(req,res){
 		if (err) throw err;
 		console.log(result);
 	});
+	
 
 	//finds the tag associated with the logged in user in the "taglist" intermediate table and then gets the tag name from the "tags" table
 	//DOESNT WORK IF USER DOESNT HAVE TAGS ON LOGIN
@@ -147,7 +223,6 @@ router.get("/profile", function(req,res){
 
 	//create query to find all chats the user is in and inside who each person inside that chat is
 
-});
 
 
 
@@ -290,5 +365,23 @@ function displayTags (taglist)
 
 	*/
 
+//writing user data in the session
+passport.serializeUser(function(id_user, done) {
+  done(null, id_user);
+});
+
+//retrieving user datafrom the session
+passport.deserializeUser(function(id_user, done) {
+  done(null, id_user);
+});
+
+function authenticationMiddleware () {  
+  return (req, res, next) => {
+    console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
+
+      if (req.isAuthenticated()) return next();
+      res.redirect('/login')
+  }
+}
 
 
