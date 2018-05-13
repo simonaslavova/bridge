@@ -1,18 +1,6 @@
-html
-	head
-		link(href='/profilestyle.css', rel='stylesheet', type='text/css')
-		link(href='https://fonts.googleapis.com/css?family=Alfa+Slab+One|Karma|Montserrat|Playfair+Display|Poiret+One|Raleway|Rozha+One|Sanchez', rel='stylesheet')
-		link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
-	script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
-	body
-		header
-			img(src='/LogoBridge.jpg', width='90', height='90')
-			nav.links
-				ol
-					a(href='/profile') Profile
-					a(href='/users/submitTag') Tags
-					a(href='/createChat') Chats
-					a(href='/users/logout') LogOut
+extends layout
+
+block content
 		.main
 			br
 			br

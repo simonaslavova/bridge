@@ -1,16 +1,14 @@
 extends layout
 
 block content
-  header
-  img(src='/LogoBridge.jpg', width='90', height='90')
-  form(action='/users/submitTag', method='POST')
-      fieldset
-        .field
-          label(for='Tname') Tag: 
-          input#Tname(type='text', name='Tname')
-        .field
-          label(for='Tcategory') Category: 
-          input#Tcategory(type='text', name='Tcategory')
-        .field
-          input(type='submit', value='create tag')
-          
+	form(action='/users/submitTag', method='POST')
+			fieldset
+				.field
+					label(for='Tname') Tag: 
+					input#Tname(type='text', name='Tname')
+				.field
+					label(for='Tcategory') Category: 
+					input#Tcategory(type='text', name='Tcategory')
+				.field
+					input(type='submit', value='create tag')
+					

@@ -158,6 +158,10 @@ router.post('/submitTag', function(req, res) {
 	res.redirect("/users/submitTag");
 });
 
+router.get("/main", function(req,res){
+	res.render('main');
+});
+
 router.get("/login", function(req,res){
 	res.render('login');
 });
