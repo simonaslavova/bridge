@@ -1,14 +1,10 @@
-
 * {
     box-sizing: border-box;
 }
 
 html, body {
     height: 100%;
-}
-
-body {
-    background: white;
+    background-color:white;
     font-family: Quicksand;
     margin: 0;
     padding: 0;
@@ -22,36 +18,20 @@ h2 {
     font-size: 20px;
 }
 
-#login {
-    padding: 15px;
-}
-
-#getstarted {
-    text-align: right;
-}
-
 #rightside {
     display: flex;
     flex-direction: column;
     justify-content: center;
-	padding: 0px 20px 20px 20px;
-	margin: 0px;
-	width : 25%;
-	height: 100%;
-	float : right;
-	background-color: orange;
+    padding: 0px 20px 20px 20px;
+    margin: 0px;
+    width : 25%;
+    height: 100%;
+    float : right;
+    background-color: orange;
 }
 
 #slogan {
 	text-align: left;
-}
-
-.rounded {
-    border-radius: 15px 15px 15px 15px;
-    background: white;
-    padding: 15px; 
-    width: 100px;
-    height: 30px; 
 }
 
 dialog {  
@@ -60,3 +40,20 @@ dialog {
     border: 1px solid #dadada;
     padding: 5px 10px 20px 20px;
 }  
+
+.field {
+    padding: 16px 0;
+}
+
+.field label {
+    display: inline-block;
+    width: 100px;
+}
+
+#login {
+    padding: 15px;
+}
+
+#getstarted {
+    text-align: right;
+}

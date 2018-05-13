@@ -1,26 +1,18 @@
-extends layout
-
+extends startup
 block content
-    #rightside
-        img(src='/LogoBridge.jpg', width='70', height='70')
-        #slogan
-            h1
-            | Find people that love
-            | the same thing as you do.
-            h2 Join Bridge today.
-        #getstarted
-            form(action='/users/start', method='post')
-                fieldset
-                    label(for='name') Username: 
-                    input#name(type='text', name='name')
-                    br
-                    label(for='email') Email: 
-                    input#email(type='email', name='email')
-                    br
-                    label(for='description') Password: 
-                    input#pass(type='text', name='pass')
-                    br
-                    label(for='description') Password Confirm: 
-                    input#passC(type='text', name='passC')
-                    br
-                    input(type='submit', value='create profile')
+				#getstarted
+						form(action='/users/start', method='post')
+								fieldset
+										label(for='name') Username: 
+										input#name(type='text', name='name')
+										br
+										label(for='email') Email: 
+										input#email(type='email', name='email')
+										br
+										label(for='description') Password: 
+										input#pass(type='text', name='pass')
+										br
+										label(for='description') Password Confirm: 
+										input#passC(type='text', name='passC')
+										br
+										input(type='submit', value='create profile')
