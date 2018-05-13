@@ -110,7 +110,7 @@ router.post('/start',urlencodedParser, function(req, res) {
 
 		bcrypt.hash(pass, saltRounds, function(err, hash){
 
-			let sql = "INSERT INTO `Users`(`id_user`, `username`, `email`, `pass_word`) VALUES (NULL, ?, ?, ?)";
+			let sql = "INSERT INTO `Users`(`id_user`, `username`, `email`, `password`) VALUES (NULL, ?, ?, ?)";
 			var vals = [req.body.name, req.body.email, hash];
 
 			con.query(sql, vals, function(err, result)  {
@@ -173,7 +173,7 @@ router.post("/login"
 	let vals=[req.body.username];
 	con.query("SELECT * FROM `Users` WHERE `username`=?", vals, function (err, result, fields) {
 		if(result.length>0){
-			if (bcrypt.compareSync(password, result[0].pass_word))
+			if (bcrypt.compareSync(password, result[0].password))
 				res.redirect("/users/profile");
 			else
 				res.redirect("/users/login");
