@@ -19,16 +19,20 @@ var passport = require('passport');
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 
-
-router.use(session({
-	secret: 'keyboard cat',
-	resave: false,
-	saveUnitialized: false ,
-	//cookie:{secure:true}
-}))
 router.use(cookieParser());
 router.use(passport.initialize());
 router.use(passport.session());
+router.use(function(req, res, next){
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
+passport.use(new LocalStrategy(function(username, password, done){
+	console.log(username);
+	console.log(password);
+	return done(null, 'lala');
+    }
+));
 
 const options = {
   host: "localhost",
@@ -39,6 +43,14 @@ const options = {
   //socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock"
 };
 var sessionStore = new MySQLStore(options);
+
+router.use(session({
+	secret: 'keyboard cat',
+	resave: false,
+	store: sessionStore,
+	saveUnitialized: false ,
+	//cookie:{secure:true}
+}))
 
 var con = mysql.createConnection({
 	host: "localhost",
@@ -63,21 +75,21 @@ failureRedirect: 'users/start'
 }));
 */
 
-router.get('/users/login', authenticationMiddleware (), (req,res)=>{
-	
+router.get('/start', (req,res)=>{
 //  deserializeUser ... if so - creates a session and returns a session key
   console.log(req.user);
   console.log(req.isAuthenticated());
-  res.redirect('/users/login');
-
-	});
+  res.render('start');
+});
 
 router.get("/profile", function(req,res){
-	con.query("SELECT * FROM `Users` WHERE `id_user`=id_user", function (err, result, fields) {
+	res.render('profile');
+	/*con.query("SELECT * FROM `Users` WHERE `id_user`=id_user", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
 	    res.render('profile',{result: JSON.stringify(result)});
 	});
+	*/
 });
 
 router.get("/start", function(req,res){
@@ -89,11 +101,7 @@ router.get("/start", function(req,res){
 });
 
 router.post('/start',urlencodedParser, function(req, res) {
-	//var hashedPass;
-	//console.log("first");
-	//var name = req.body.name;
     var pass = req.body.pass;
-    //var mail = req.body.mail;
 
 	if(req.body.pass==req.body.passC && req.body.name!="" && req.body.email!=""){
 		//pass=req.body.pass;
@@ -132,7 +140,6 @@ router.post('/start',urlencodedParser, function(req, res) {
 	
 });
 
-
 router.get('/submitTag',function(req,res){
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
@@ -155,7 +162,12 @@ router.get("/login", function(req,res){
 	res.render('login');
 });
 
-router.post("/login",urlencodedParser, function(req,res){
+router.post("/login"
+	/*, passport.authenticate('local',{
+	successRedirect: '/profile',
+	failureRedirect: '/login'
+    })*/
+    , urlencodedParser, function(req,res){
 	var username = req.body.username;
 	var password = req.body.pass;
 	let vals=[req.body.username];
@@ -171,7 +183,13 @@ router.post("/login",urlencodedParser, function(req,res){
 	});
 });
 
-router.get("/profile", function(req,res){
+router.get("/logout", function(req,res){
+	req.logout();
+	req.session.destroy();
+	res.render('login');
+});
+
+/*router.get("/profile", authenticationMiddleware(), function(req,res){
 	res.render('profile');
 	//console.log(idMaster);
 	//var tagID;
@@ -183,6 +201,8 @@ router.get("/profile", function(req,res){
 		if (err) throw err;
 		console.log(result);
 	});
+
+//<<<<<<< HEAD
 	
 
 	//finds the tag associated with the logged in user in the "taglist" intermediate table and then gets the tag name from the "tags" table
@@ -223,8 +243,10 @@ router.get("/profile", function(req,res){
 
 	//create query to find all chats the user is in and inside who each person inside that chat is
 
-
-
+//=======
+});
+//>>>>>>> 0ed60bdb3005505bfd42b1a406d868b31eb1ffd6
+*/
 
 //SHOULD UPLOAD TO TAGLIST CURRENT LOGGED IN USER AND THE INPUT OF WHATVER TAG ID WE PUT IN		
 router.get('/tagToUser',function(req,res){
@@ -299,20 +321,6 @@ router.post('/InviteToChat', function(req, res, next) {
 	res.redirect("/users/InviteToChat");
 });
 
-
-// router.get('/taglist', function(req,res){
-
-// 	con.query("SELECT * FROM ´Tags`", function (err, result, fields){
-// 		if (err) throw err;
-// 		console.log(result);
-// 		res.render(result);
-
-
-
-// 	});
-
-// });
-
 function displayTags (taglist)
 {
 	for(var z=0; z<taglist.length; z++)
@@ -322,48 +330,16 @@ function displayTags (taglist)
 	console.log("function working");
 }
 
-/*function find_chat_random (tagid)
-{
-	var match_list = [];
-	var t= 0;
-
-	con.query("SELECT * FROM `taglist` WHERE `id_tag`='"+tagid+"' AND `id_user`!='"+idMaster+"'", function (err, result, fields) {
-		if (err) throw err;
+router.get('/findRandomChat',(req,res)=>{
+	let sql = 'SELECT * FROM Users';
+	db.query(sql,(err,result)=>{
+		if(err)throw err;
 		console.log(result);
-		result = result[Math.floor(Math.random() * result.length)];
-		console.log(result);
+		res.send(result);
 
 	});
+});
 
-		for(var z=0; z < user_list.length; z++)//goes through each user
-		{
-			for(var y=0; y < user_list[z].tags.length; y++)//goes through each tag of the user
-			{
-				for(var x=0; x<tag_names.length; x++)
-				{
-					if(user_list[z].tags[y].name==tag_names[x])
-						t++;
-					//console.log("comparing tags to given list");
-				}
-				//console.log("each tag of each user");
-			}
-
-			if(t==tag_names.length)
-			{
-				match_list.push(user_list[z]);
-				console.log("match");
-			}
-			//console.log("user list loop");
-
-			t=0;
-		}
-		//console.log("full function");
-
-		var result = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
-		//setup chat with 'result'
-	}
-
-	*/
 
 //writing user data in the session
 passport.serializeUser(function(id_user, done) {
@@ -375,13 +351,11 @@ passport.deserializeUser(function(id_user, done) {
   done(null, id_user);
 });
 
-function authenticationMiddleware () {  
+function authenticationMiddleware() {  
   return (req, res, next) => {
     console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
 
       if (req.isAuthenticated()) return next();
-      res.redirect('/login')
+      res.redirect('/users/login')
   }
 }
-
-
