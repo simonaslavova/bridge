@@ -17,6 +17,10 @@ block content
 				p
 					| At one time driven solely by his will to survive, Thales finds purpose in life upon joining the Band of the Falcon, greatly helping in the faction's storied successes during
 					| the Hundred-Year War as the Falcon's Raiders Captain. He eventually becomes dissatisfied with clinging on to Griffith's dream, and departs from the Falcons in pursuit of his own.
+			#uploadPic
+				form(action='/users/imginsert', method='post', enctype='multipart/form-data')
+					input(type='file', name ='file', value='file')
+					input(type='submit', value='submit')
 			br
 			br
 			br

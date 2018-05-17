@@ -3,6 +3,9 @@ var router = express.Router();
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
 
+var multer = require('multer'); 
+var path   = require('path');
+
 var idMaster;
 var router = express.Router();
 module.exports = router; 
@@ -363,3 +366,43 @@ function authenticationMiddleware() {
       res.redirect('/users/login')
   }
 }
+
+//upload pics
+
+var storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, './uploaded')
+    },
+    filename: function(req, file, callback) {
+        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+
+router.get('/imginsert', function(req,res){
+	res.render('profile');
+});
+
+
+router.post('/imginsert',multer({
+    storage: storage,
+    fileFilter: function(req, file, callback) {
+        var ext = path.extname(file.originalname)
+        if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') 
+                    {
+            return callback(res.end('Only images are allowed'), null)
+        }
+        callback(null, true)
+    }
+}).single('file'), function(req, res) {
+ /*img is the name that you define in the html input type="file" name="img" */       
+ 
+        var query = con.query("INSERT INTO `Pictures`(`profile_picture`) VALUES ('"+req.file.path+"')" ,function(err, rows)      
+        {                                                      
+          if (err)
+            throw err;
+         res.redirect('/users/profile');
+        });
+
+        //console.log(query.sql);
+        //console.log(req.file);
+    });
