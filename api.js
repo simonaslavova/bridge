@@ -86,13 +86,12 @@ router.get('/start', (req,res)=>{
 });
 
 router.get("/profile", function(req,res){
-	res.render('profile');
-	/*con.query("SELECT * FROM `Users` WHERE `id_user`=id_user", function (err, result, fields) {
+	//res.render('profile');
+	con.query("SELECT * FROM `Users`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
 	    res.render('profile',{result: JSON.stringify(result)});
 	});
-	*/
 });
 
 router.get("/start", function(req,res){
@@ -395,7 +394,7 @@ router.post('/imginsert',multer({
     }
 }).single('file'), function(req, res) {
  /*img is the name that you define in the html input type="file" name="img" */       
- 
+
         var query = con.query("INSERT INTO `Pictures`(`profile_picture`) VALUES ('"+req.file.path+"')" ,function(err, rows)      
         {                                                      
           if (err)
