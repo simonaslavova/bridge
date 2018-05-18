@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
+const cors = require('cors');
+const Chatkit = require('pusher-chatkit-server');
 
 var multer = require('multer'); 
 var path   = require('path');
@@ -28,6 +30,11 @@ router.use(passport.session());
 router.use(function(req, res, next){
   res.locals.isAuthenticated = req.isAuthenticated();
   next();
+});
+
+const chatkit = new Chatkit.default({
+	instanceLocator: 'v1:us1:81941ebe-9108-491a-9404-a72023fce067',
+	key: 'afd9316a-e943-4b38-a2d7-7490bd5669ad:L1R/w+BIYaKu11tgjAMCHRNz3LYtGJ9eUSBdV1/M7X8=',
 });
 
 passport.use(new LocalStrategy(function(username, password, done){
@@ -132,6 +139,25 @@ router.post('/start',urlencodedParser, function(req, res) {
                      //res.redirect('/users/login');  
 
                      });
+                  //chatkit begin
+                  const { username } = req.body
+                  chatkit.createUser({ 
+                  	id: req.body.email, 
+                  	name: req.body.name 
+                  })
+                  .then(() => res.sendStatus(201))
+                  .catch(error => {
+                  	if (error.error_type === 'services/chatkit/user_already_exists') {
+                  		//res.sendStatus(200)
+                  		console.log("user already exists")
+                  	} else {
+                  		//res.status(error.status).json(error)
+                  		console.log(error.status)
+                  		//this section still gives the catch error, dont know why, uncomment the res.status to see message
+                  	}
+                  	return null
+                  })
+                  //chatkit end
 			     });
 		    });
 		res.redirect("/users/login");
@@ -148,6 +174,10 @@ router.get('/submitTag',function(req,res){
 		console.log(result);
 		res.render('submitTag', {result: JSON.stringify(result)});
 	});
+});
+
+router.get("/chat", function(req,res){
+	res.render('chatkit');
 });
 
 router.post('/submitTag', function(req, res) {
