@@ -9,6 +9,7 @@ var multer = require('multer');
 var path   = require('path');
 
 var idMaster;
+
 var router = express.Router();
 module.exports = router; 
 
@@ -85,19 +86,12 @@ failureRedirect: 'users/start'
 }));
 */
 
-router.get('/start', (req,res)=>{
-//  deserializeUser ... if so - creates a session and returns a session key
-  console.log(req.user);
-  console.log(req.isAuthenticated());
-  res.render('start');
-});
-
-router.get("/profile", function(req,res){
-	//res.render('profile');
+router.get("/profile", authenticationMiddleware(), function(req,res){
+	console.log(req.user);
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
-	    res.render('profile',{result: JSON.stringify(result)});
+	    res.render('profile',{result: result});
 	});
 });
 
@@ -105,11 +99,11 @@ router.get("/start", function(req,res){
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
-	    res.render('start',{result: JSON.stringify(result)});
+	    res.render('start', {result: result});
 	});
 });
 
-router.post('/start',urlencodedParser, function(req, res) {
+router.post('/start', urlencodedParser, function(req, res) {
     var pass = req.body.pass;
 
 	if(req.body.pass==req.body.passC && req.body.name!="" && req.body.email!=""){
@@ -145,8 +139,7 @@ router.post('/start',urlencodedParser, function(req, res) {
                   	id: req.body.email, 
                   	name: req.body.name 
                   })
-                  .then(() => res.sendStatus(201))
-                  .catch(error => {
+                  .then(() => res.sendStatus(201)).catch(error => {
                   	if (error.error_type === 'services/chatkit/user_already_exists') {
                   		//res.sendStatus(200)
                   		console.log("user already exists")
@@ -210,7 +203,9 @@ router.post("/login"
 	con.query("SELECT * FROM `Users` WHERE `username`=?", vals, function (err, result, fields) {
 		if(result.length>0){
 			if (bcrypt.compareSync(password, result[0].password))
-				res.redirect("/users/profile");
+			{
+				res.redirect("/users/chat");
+			}
 			else
 				res.redirect("/users/login");
 		}
