@@ -14,11 +14,16 @@ block content
         const tokenProvider = new Chatkit.TokenProvider({
           url: "https://us1.pusherplatform.io/services/chatkit_token_provider/v1/81941ebe-9108-491a-9404-a72023fce067/token"
         });
-        const chatManager = new Chatkit.ChatManager({
-          instanceLocator: "v1:us1:81941ebe-9108-491a-9404-a72023fce067",
-          userId: "zed@zed.com",//need to get user email from passport.
-          tokenProvider: tokenProvider
-        });
+
+        $.get('/users/whoLog').done(function(response) {
+          var chatUser = response;
+          const chatManager = new Chatkit.ChatManager({
+            instanceLocator: "v1:us1:81941ebe-9108-491a-9404-a72023fce067",
+            userId: response,//need to get user email from passport.
+            tokenProvider: tokenProvider
+          });
+
+
         var randomUser;
         $.get('/users/randomUser').done(function(response) {
           randomUser = response;
@@ -62,4 +67,5 @@ block content
           .catch(error => {
             console.error("error:", error);
           });
+        });
         });

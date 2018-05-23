@@ -98,8 +98,7 @@ router.post('/start', function(req, res) {
 		res.redirect("/users/start");
 });
 
-router.get("/chat", function(req,res){
-	findUserForChat(69);
+router.get("/chat", authenticationMiddleware(), function(req,res){
 	res.render('chatkit');
 });
 
@@ -298,104 +297,105 @@ router.post('/imginsert',multer({
     });
 
 //THALES FUNCTIOS
-function findUserForChat(x)
-{
+// function findUserForChat(x)
+// {
+// 	var fullTaglist=[];
+// 	var userTags=[];
+// 	var foundUser;
+
+// 	con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
+// 		userTags=result;
+// 		console.log(userTags);
+
+// 		if(userTags.length>0)//if above query returns that the user has tags
+// 		{
+// 			con.query("SELECT * FROM `taglist` WHERE `id_user`!="+x+" ORDER BY `id_user` ASC, `id_tag` ASC", function (err, result, fields) {
+// 				fullTaglist=result;
+// 				console.log(fullTaglist);
+// 				console.log(fullTaglist[0].id_user);
+// 				var idTracker=fullTaglist[0].id_user;
+// 				var match=0;
+// 				var match_list=[];
+
+// 				for(var a=0; a<fullTaglist.length; a++)//go through each element of the fullTaglist
+// 				{
+// 					//console.log("currentID " +fullTaglist[a].id_user + " tracker: " +idTracker);
+// 					if(fullTaglist[a].id_user==idTracker)//skipping over one match for some reason when switching id's
+// 					{
+// 						for(var z=0; z<userTags.length; z++)//check if current id matches with tags
+// 						{
+// 							if(fullTaglist[a].id_tag == userTags[z].id_tag)//if match, increase match
+// 							{
+// 								match++; 
+// 								console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
+// 							}
+// 						}
+// 						if(match==userTags.length)//if match with all, push this user into a matched array
+// 						{
+// 							match_list.push(fullTaglist[a].id_user);
+// 							console.log("pushed "+fullTaglist[a].id_user+" at if");
+// 							match=0;
+// 						}
+// 					}
+// 					else
+// 					{
+// 						idTracker=fullTaglist[a].id_user;
+// 						match=0;
+
+// 						if(fullTaglist[a].id_tag == userTags[0].id_tag)//if match, increase match
+// 						{
+// 							match++; 
+// 							console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
+// 						}
+// 						if(match==userTags.length)//if match with all, push this user into a matched array
+// 						{
+// 							match_list.push(fullTaglist[a].id_user);
+// 							console.log("pushed "+fullTaglist[a].id_user+" at else");
+// 							match=0;
+// 						}
+// 					}
+// 				}//end of top for
+
+// 				console.log(match_list);
+
+// 				foundUser = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
+// 				console.log("randomly chosen user: " +foundUser);
+
+// 				con.query("SELECT `email` FROM `users` WHERE `id_user`="+foundUser+"", function (err, result, fields) {
+// 					if (err) throw err;
+// 					console.log("email to return: "+result[0].email);//THIS RESULT HERE IS THE ID THAT NEEDS TO GET SENT TO NEXT FUNCTION
+// 					return result[0].email;
+// 				});
+
+				
+// 			});
+// 		}//end of if user has taglist>0
+// 		else//if the query returns that the user does not have tags in the list, doesnt work as it should.
+// 		{
+			
+// 			var list=[];
+			
+
+// 			con.query("SELECT * FROM `Users` WHERE `id_user`!="+x+"", function (err, result, fields) {
+// 				list=result;
+
+// 				foundUser = list[Math.floor(Math.random() * list.length)].email;//picks random user out of the list of matches
+// 				console.log("randomly chosen user: " +foundUser);
+
+				
+// 				return foundUser;
+// 			});
+// 		}
+// 	});
+// }
+
+router.get('/randomUser', authenticationMiddleware(), function(req,res){
+
+	var id =req.user.id_user;
 	var fullTaglist=[];
 	var userTags=[];
 	var foundUser;
-
-	con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
-		userTags=result;
-		console.log(userTags);
-
-		if(userTags.length>0)//if above query returns that the user has tags
-		{
-			con.query("SELECT * FROM `taglist` WHERE `id_user`!="+x+" ORDER BY `id_user` ASC, `id_tag` ASC", function (err, result, fields) {
-				fullTaglist=result;
-				console.log(fullTaglist);
-				console.log(fullTaglist[0].id_user);
-				var idTracker=fullTaglist[0].id_user;
-				var match=0;
-				var match_list=[];
-
-				for(var a=0; a<fullTaglist.length; a++)//go through each element of the fullTaglist
-				{
-					//console.log("currentID " +fullTaglist[a].id_user + " tracker: " +idTracker);
-					if(fullTaglist[a].id_user==idTracker)//skipping over one match for some reason when switching id's
-					{
-						for(var z=0; z<userTags.length; z++)//check if current id matches with tags
-						{
-							if(fullTaglist[a].id_tag == userTags[z].id_tag)//if match, increase match
-							{
-								match++; 
-								console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
-							}
-						}
-						if(match==userTags.length)//if match with all, push this user into a matched array
-						{
-							match_list.push(fullTaglist[a].id_user);
-							console.log("pushed "+fullTaglist[a].id_user+" at if");
-							match=0;
-						}
-					}
-					else
-					{
-						idTracker=fullTaglist[a].id_user;
-						match=0;
-
-						if(fullTaglist[a].id_tag == userTags[0].id_tag)//if match, increase match
-						{
-							match++; 
-							console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
-						}
-						if(match==userTags.length)//if match with all, push this user into a matched array
-						{
-							match_list.push(fullTaglist[a].id_user);
-							console.log("pushed "+fullTaglist[a].id_user+" at else");
-							match=0;
-						}
-					}
-				}//end of top for
-
-				console.log(match_list);
-
-				foundUser = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
-				console.log("randomly chosen user: " +foundUser);
-
-				con.query("SELECT `email` FROM `users` WHERE `id_user`="+foundUser+"", function (err, result, fields) {
-					if (err) throw err;
-					console.log("email to return: "+result[0].email);//THIS RESULT HERE IS THE ID THAT NEEDS TO GET SENT TO NEXT FUNCTION
-					return result[0].email;
-				});
-
-				
-			});
-		}//end of if user has taglist>0
-		else//if the query returns that the user does not have tags in the list, doesnt work as it should.
-		{
-			
-			var list=[];
-			
-
-			con.query("SELECT * FROM `Users` WHERE `id_user`!="+x+"", function (err, result, fields) {
-				list=result;
-
-				foundUser = list[Math.floor(Math.random() * list.length)].email;//picks random user out of the list of matches
-				console.log("randomly chosen user: " +foundUser);
-
-				
-				return foundUser;
-			});
-		}
-	});
-}
-
-router.get('/randomUser', function(req,res){
-
-	var fullTaglist=[];
-	var userTags=[];
-	var foundUser;
-	var x=69;
+	var x=id;
 
 	con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
 		userTags=result;
@@ -484,4 +484,10 @@ router.get('/randomUser', function(req,res){
 
 });
 
+router.get('/whoLog', authenticationMiddleware(), function(req,res){
+	var loggedUserEmail =req.user.email;
+	res.send(loggedUserEmail);
+
+
+});
 module.exports = router; 
