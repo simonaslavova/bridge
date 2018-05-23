@@ -2,7 +2,29 @@ html
   head
     link(href='/startstyle.css', rel='stylesheet', type='text/css')
     link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
   body
+    #leftside
+      .slideshow-container
+      .mySlides.fade
+        .numbertext 1 / 3
+        img(src='/1.jpg', style='width:100%')
+        .text Connecting People
+      .mySlides.fade
+        .numbertext 2 / 3
+        img(src='/2.jpg', style='width:100%')
+        .text Building Bridges
+      .mySlides.fade
+        .numbertext 3 / 3
+        img(src='/3.jpg', style='width:100%')
+        .text Find new Friends
+      a.prev(onclick='plusSlides(-1)') ❮
+      a.next(onclick='plusSlides(1)') ❯
+      br
+      div(style='text-align:center')
+        span.dot(onclick='currentSlide(1)')
+        span.dot(onclick='currentSlide(2)')
+        span.dot(onclick='currentSlide(3)')
     #rightside
       img(src='/LogoBridge.jpg', width='70', height='70')
       #slogan
@@ -11,3 +33,22 @@ html
           | the same thing as you do.
         h2 Join Bridge today.
       block content
+  script.
+      var slideIndex = 0;
+      showSlides()
+      function showSlides() {
+      var i;
+      var slides = document.getElementsByClassName("mySlides");
+      var dots = document.getElementsByClassName("dot");
+      for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+      }
+      slideIndex++;
+      if (slideIndex > slides.length) {slideIndex = 1}
+      for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+      }
+      slides[slideIndex-1].style.display = "block";
+      dots[slideIndex-1].className += " active";
+      setTimeout(showSlides, 2000); // Change image every 2 seconds
+      }

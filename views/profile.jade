@@ -4,92 +4,17 @@ block content
 		.main
 			br
 			br
-			// profilepic
-			img#profilepic(src='/pp.jpg')
-			#bio
-				// username
-				h1 Thales
-				// bio
-				p 21, Lisbon PT
-				p
-					| Thales, renowned by his epithet the "Black Swordsman", is a former mercenary and branded wanderer who travels the world in a constant internal
-					| struggle between pursuing his own ends and protecting those dear to him.
-				p
-					| At one time driven solely by his will to survive, Thales finds purpose in life upon joining the Band of the Falcon, greatly helping in the faction's storied successes during
-					| the Hundred-Year War as the Falcon's Raiders Captain. He eventually becomes dissatisfied with clinging on to Griffith's dream, and departs from the Falcons in pursuit of his own.
-			#uploadPic
-				form(action='/users/imginsert', method='post', enctype='multipart/form-data')
-					input(type='file', name ='file', value='file')
-					input(type='submit', value='submit')
-			br
-			br
-			br
-			#lists
-				#taglist
-					h2#navtitle List of Tags
-					nav
-						ul
-							li#tag1
-								a(href='#') tag_name()
-							li#tag2
-								a(href='#') tag_name()
-							li#tag3
-								a(href='#') tag_name()
-							li#tag4
-								a(href='#') tag_name()
-							li#tag5
-								a(href='#') tag_name()
-							li#tag6
-								a(href='#') tag_name()
-							li#tag7
-								a(href='#') tag_name()
-							li#tag8
-								a(href='#') tag_name()
-							li#tag9
-								a(href='#') tag_name()
-				#chatlist
-					h2#navtitle List of Chats
-					nav
-						ul
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-							li
-								a(href='#') chat_name
-				#friendlist
-					h2#navtitle Friendlist
-					nav
-						ul
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-							li
-								a(href='#') friend_name
-			br
-			br
+			img#profilepic
+		#bio
+			each item in users
+				p="Username: " + item.username
+				p="ID of the User: " + item.id_user
+				p=item.bio
+		#uploadpic
+			form(action='/users/imginsert', method='post', enctype='multipart/form-data')
+				input(type='file', name ='file', value='file')
+				input(type='submit', value='submit')
+		#tags
+			h2#navtitle My Tags
+			each item in tags
+				p=item.id_tag

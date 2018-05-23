@@ -1,15 +1,9 @@
 extends layout
 
 block content
-			p#user 
-		#friends
-		#createtag
-			button  Create a tag 
-		#createchat
-			button  Find a chat 
-		script.
-			var friends=["simona","Thales"]
-			friends.foreach(element=>{
-			document.getElementById("Friends")+= element+ "<br>";
-			});
-		div(id='')
+	#taglist
+		h1 Select Tags:
+		input#tag(type='text', name='tag')
+		form(action='/users/search', method='post')
+			input(type='submit', value='Search')
+

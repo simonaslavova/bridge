@@ -4,15 +4,16 @@ block content
 						form(action='/users/start', method='post')
 								fieldset
 										label(for='name') Username: 
-										input#name(type='text', name='name')
+										input#name(type='text', name='username')
 										br
 										label(for='email') Email: 
 										input#email(type='email', name='email')
 										br
 										label(for='description') Password: 
-										input#pass(type='text', name='pass')
+										input#pass(type='text', name='password')
 										br
 										label(for='description') Password Confirm: 
 										input#passC(type='text', name='passC')
 										br
 										input(type='submit', value='create profile')
+							a(href='/users/login') Log In
