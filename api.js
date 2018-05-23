@@ -7,6 +7,7 @@ const Chatkit = require('pusher-chatkit-server');
 
 var multer = require('multer'); 
 var path   = require('path');
+var $ = require('jquery');
 
 var idMaster;
 
@@ -23,14 +24,14 @@ var session = require('express-session')
 var MySQLStore = require('express-mysql-session')(session);
 var passport = require('passport');
 var passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy;
+, LocalStrategy = require('passport-local').Strategy;
 
 router.use(cookieParser());
 router.use(passport.initialize());
 router.use(passport.session());
 router.use(function(req, res, next){
-  res.locals.isAuthenticated = req.isAuthenticated();
-  next();
+	res.locals.isAuthenticated = req.isAuthenticated();
+	next();
 });
 
 const chatkit = new Chatkit.default({
@@ -42,15 +43,15 @@ passport.use(new LocalStrategy(function(username, password, done){
 	console.log(username);
 	console.log(password);
 	return done(null, 'lala');
-    }
+}
 ));
 
 const options = {
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: "",
-  database: "Bridge",
+	host: "localhost",
+	port: 3306,
+	user: "root",
+	password: "",
+	database: "bridge",
   //socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock"
 };
 var sessionStore = new MySQLStore(options);
@@ -68,7 +69,7 @@ var con = mysql.createConnection({
 	port: 3306,
 	user: "root",
 	password: "",
-	database: "Bridge",
+	database: "bridge",
 });
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -91,7 +92,7 @@ router.get("/profile", authenticationMiddleware(), function(req,res){
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
-	    res.render('profile',{result: result});
+		res.render('profile',{result: result});
 	});
 });
 
@@ -99,12 +100,12 @@ router.get("/start", function(req,res){
 	con.query("SELECT * FROM `Users`", function (err, result, fields) {
 		if (err) throw err;
 		console.log(result);
-	    res.render('start', {result: result});
+		res.render('start', {result: result});
 	});
 });
 
 router.post('/start', urlencodedParser, function(req, res) {
-    var pass = req.body.pass;
+	var pass = req.body.pass;
 
 	if(req.body.pass==req.body.passC && req.body.name!="" && req.body.email!=""){
 		//pass=req.body.pass;
@@ -122,17 +123,17 @@ router.post('/start', urlencodedParser, function(req, res) {
 				let sql = "SELECT LAST_INSERT_ID() as id_user";
 
 				con.query(sql,(err,result)=>{
-                  if(err)throw err;
+					if(err)throw err;
 
-                  var id_user = result[0];
-                  console.log(result[0]);
+					var id_user = result[0];
+					//console.log(result[0]);
 
                   //LOGIN USER-create a session
-                     req.login(id_user,function(err){
+                  req.login(id_user,function(err){
 
                      //res.redirect('/users/login');  
 
-                     });
+                 });
                   //chatkit begin
                   const { username } = req.body
                   chatkit.createUser({ 
@@ -151,10 +152,10 @@ router.post('/start', urlencodedParser, function(req, res) {
                   	return null
                   })
                   //chatkit end
-			     });
-		    });
-		res.redirect("/users/login");
-	    });
+              });
+			});
+			res.redirect("/users/login");
+		});
 	}
 	else
 		res.redirect("/users/start");
@@ -170,6 +171,7 @@ router.get('/submitTag',function(req,res){
 });
 
 router.get("/chat", function(req,res){
+	findUserForChat(69);
 	res.render('chatkit');
 });
 
@@ -195,8 +197,8 @@ router.post("/login"
 	/*, passport.authenticate('local',{
 	successRedirect: '/profile',
 	failureRedirect: '/login'
-    })*/
-    , urlencodedParser, function(req,res){
+})*/
+, urlencodedParser, function(req,res){
 	var username = req.body.username;
 	var password = req.body.pass;
 	let vals=[req.body.username];
@@ -374,32 +376,32 @@ router.get('/findRandomChat',(req,res)=>{
 
 //writing user data in the session
 passport.serializeUser(function(id_user, done) {
-  done(null, id_user);
+	done(null, id_user);
 });
 
 //retrieving user datafrom the session
 passport.deserializeUser(function(id_user, done) {
-  done(null, id_user);
+	done(null, id_user);
 });
 
 function authenticationMiddleware() {  
-  return (req, res, next) => {
-    console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
+	return (req, res, next) => {
+		console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
 
-      if (req.isAuthenticated()) return next();
-      res.redirect('/users/login')
-  }
+		if (req.isAuthenticated()) return next();
+		res.redirect('/users/login')
+	}
 }
 
 //upload pics
 
 var storage = multer.diskStorage({
-    destination: function(req, file, callback) {
-        callback(null, './uploaded')
-    },
-    filename: function(req, file, callback) {
-        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
+	destination: function(req, file, callback) {
+		callback(null, './uploaded')
+	},
+	filename: function(req, file, callback) {
+		callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+	}
 })
 
 router.get('/imginsert', function(req,res){
@@ -408,25 +410,137 @@ router.get('/imginsert', function(req,res){
 
 
 router.post('/imginsert',multer({
-    storage: storage,
-    fileFilter: function(req, file, callback) {
-        var ext = path.extname(file.originalname)
-        if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') 
-                    {
-            return callback(res.end('Only images are allowed'), null)
-        }
-        callback(null, true)
-    }
+	storage: storage,
+	fileFilter: function(req, file, callback) {
+		var ext = path.extname(file.originalname)
+		if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') 
+		{
+			return callback(res.end('Only images are allowed'), null)
+		}
+		callback(null, true)
+	}
 }).single('file'), function(req, res) {
- /*img is the name that you define in the html input type="file" name="img" */       
+	/*img is the name that you define in the html input type="file" name="img" */       
 
-        var query = con.query("INSERT INTO `Pictures`(`profile_picture`) VALUES ('"+req.file.path+"')" ,function(err, rows)      
-        {                                                      
-          if (err)
-            throw err;
-         res.redirect('/users/profile');
-        });
+	var query = con.query("INSERT INTO `Pictures`(`profile_picture`) VALUES ('"+req.file.path+"')" ,function(err, rows)      
+	{                                                      
+		if (err)
+			throw err;
+		res.redirect('/users/profile');
+	});
 
         //console.log(query.sql);
         //console.log(req.file);
     });
+
+
+// chatkit.createRoom({
+// 	creatorId: 'userId',
+// 	name: 'my room',
+// 	addUserIds: ['q@q.com']
+//   //addUserIds:[currentUser, foundUser]
+// })
+// .then(() => {
+// 	console.log('Room created successfully');
+// }).catch((err) => {
+// 	console.log(err);
+// });
+
+
+function findUserForChat(x)
+{//have to write in exception if the user has no tags in taglist. will probably require an entirely new function since Cannot read property 'id_tag' of undefined errors would keep hapening if list is empty.
+var fullTaglist=[];
+var userTags=[];
+var foundUser;
+
+con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
+	userTags=result;
+	console.log(userTags);
+
+	if(userTags.length>0)//if above query returns that the user has tags
+	{
+		con.query("SELECT * FROM `taglist` WHERE `id_user`!="+x+" ORDER BY `id_user` ASC, `id_tag` ASC", function (err, result, fields) {
+			fullTaglist=result;
+			console.log(fullTaglist);
+			console.log(fullTaglist[0].id_user);
+			var idTracker=fullTaglist[0].id_user;
+			var match=0;
+			var match_list=[];
+
+			for(var a=0; a<fullTaglist.length; a++)//go through each element of the fullTaglist
+			{
+				//console.log("currentID " +fullTaglist[a].id_user + " tracker: " +idTracker);
+				if(fullTaglist[a].id_user==idTracker)//skipping over one match for some reason when switching id's
+				{
+					for(var z=0; z<userTags.length; z++)//check if current id matches with tags
+					{
+						if(fullTaglist[a].id_tag == userTags[z].id_tag)//if match, increase match
+						{
+							match++; 
+							console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
+						}
+					}
+					if(match==userTags.length)//if match with all, push this user into a matched array
+					{
+						match_list.push(fullTaglist[a].id_user);
+						console.log("pushed "+fullTaglist[a].id_user+" at if");
+						match=0;
+					}
+				}
+				else
+				{
+					idTracker=fullTaglist[a].id_user;
+					match=0;
+
+					if(fullTaglist[a].id_tag == userTags[0].id_tag)//if match, increase match
+					{
+						match++; 
+						console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
+					}
+					if(match==userTags.length)//if match with all, push this user into a matched array
+					{
+						match_list.push(fullTaglist[a].id_user);
+						console.log("pushed "+fullTaglist[a].id_user+" at else");
+						match=0;
+					}
+				}
+			}//end of top for
+
+			console.log(match_list);
+
+			foundUser = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
+			console.log("randomly chosen user: " +foundUser);
+
+			con.query("SELECT `email` FROM `users` WHERE `id_user`="+foundUser+"", function (err, result, fields) {
+				if (err) throw err;
+				console.log(result[0].email);//THIS RESULT HERE IS THE ID THAT NEEDS TO GET SENT TO NEXT FUNCTION
+				return result[0].email;
+			});
+
+			
+		});
+	}//end of if user has taglist>0
+	else//if the query returns that the user does not have tags in the list, doesnt work as it should.
+	{
+		
+		var list=[];
+		
+
+		con.query("SELECT * FROM `Users` WHERE `id_user`!="+x+"", function (err, result, fields) {
+			list=result;
+
+			foundUser = list[Math.floor(Math.random() * list.length)].email;//picks random user out of the list of matches
+			console.log("randomly chosen user: " +foundUser);
+
+			
+			return foundUser;
+		});
+	}
+});
+}
+
+router.get('/randomUser', function(req,res){
+	//NEED TO GET THIS WORKING SO I CAN CALL IT THE CHATKIT.JADE AND USE IT TO ADD THE FOUND USER TO THE ROOM
+	//res.send(findUserForChat(69));
+	res.send("a@a.com");
+});
