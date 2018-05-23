@@ -30,46 +30,46 @@ head
         tokenProvider: tokenProvider
       });
       var randomUser;
-            $.get('/randomUser').done(function(response) {
-              randomUser = response;
-              console.log("jquery response: "+randomUser);
-            })
-            chatManager.connect().then(currentUser => {
-              currentUser.createRoom({
-                name: 'foundChat',
-                private: true,
-           // addUserIds: [currentUser.id, "a@a.com"]//works if i dont use the random user
-                addUserIds:[currentUser.id, "a@a.com"]
-        }).then(room => {
-          console.log(`Created room called ${room.name}`)
-          currentUser.subscribeToRoom({
-            roomId: room.id,
-            hooks: {
-              onNewMessage: message => {
-                const ul = document.getElementById("message-list");
-                const li = document.createElement("li");
-                li.appendChild(
-                  document.createTextNode(`${message.sender.name}: ${message.text}`)
-                  );
-                ul.appendChild(li);
+      $.get('/users/randomUser').done(function(response) {
+        randomUser = response;
+        console.log(randomUser);
+
+        chatManager.connect().then(currentUser => {
+          currentUser.createRoom({
+            name: 'foundChat',
+            private: true,
+             addUserIds:[currentUser.id, randomUser]
+           }).then(room => {
+            console.log(`Created room called ${room.name}`)
+            currentUser.subscribeToRoom({
+              roomId: room.id,
+              hooks: {
+                onNewMessage: message => {
+                  const ul = document.getElementById("message-list");
+                  const li = document.createElement("li");
+                  li.appendChild(
+                    document.createTextNode(`${message.sender.name}: ${message.text}`)
+                    );
+                  ul.appendChild(li);
+                }
               }
-            }
-        });
-          const form = document.getElementById("message-form");
-          form.addEventListener("submit", e => {
-            e.preventDefault();
-            const input = document.getElementById("message-text");
-            currentUser.sendMessage({
-              text: input.value,
-            roomId: room.id
-        });
-            input.value = "";
-          });
-        })
-        .catch(err => {
-          console.log(`Error creating room ${err}`)
-        })
-            })//end of chatmanager.connect
-            .catch(error => {
-              console.error("error:", error);
             });
+            const form = document.getElementById("message-form");
+            form.addEventListener("submit", e => {
+              e.preventDefault();
+              const input = document.getElementById("message-text");
+              currentUser.sendMessage({
+                text: input.value,
+                roomId: room.id
+              });
+              input.value = "";
+            });
+          })
+           .catch(err => {
+            console.log(`Error creating room ${err}`)
+          })
+        })//end of chatmanager.connect  
+        .catch(error => {
+          console.error("error:", error);
+        });
+      });
