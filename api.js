@@ -4,6 +4,8 @@ var router = express.Router();
 var multer = require('multer'); 
 var path   = require('path');
 var passport   = require('passport');
+const Chatkit = require('pusher-chatkit-server');
+var $ = require('jquery');
 
 var idMaster;
 
@@ -18,6 +20,11 @@ router.post('/login', passport.authenticate('local-login', {
 	failureRedirect: '/users/login'
 }));
 
+const chatkit = new Chatkit.default({
+	instanceLocator: 'v1:us1:81941ebe-9108-491a-9404-a72023fce067',
+	key: 'afd9316a-e943-4b38-a2d7-7490bd5669ad:L1R/w+BIYaKu11tgjAMCHRNz3LYtGJ9eUSBdV1/M7X8=',
+});
+
 function authenticationMiddleware() {
   return (req, res, next) => {
   	// console.log(`New session : ${JSON.stringify(req.sessionID)}`);
@@ -30,69 +37,70 @@ function authenticationMiddleware() {
   };
 }
 
-router.post("/start", function (req, res) {
-  var username = req.body.username;
-  var password = req.body.password;
-  var email = req.body.email;
-
-  bcrypt.hash(password, saltRounds, function (err, hash) {
-    let sqlid =
-      "INSERT INTO `Users`(`id_user`, `username`, `email`, `password`) VALUES (NULL, ?, ?, ?)";
-    let vals = [username, email, hash];
-    con.query(sqlid, vals, function (err, result) {
-      let sql = "SELECT LAST_INSERT_ID() as id_user";
-
-      con.query(sql, (err, result) => {
-        if (err) throw err;
-
-        var id_user = result[0].id_user;
-        console.log("New user with ID: " + id_user);
-
-        //LOGIN USER-create a session
-        req.login(id_user, function (err) {
-          if (err) {
-            return next(err);
-          }
-          res.redirect("/users/profile");
-        });
-      });
-    });
-  });
-});
-
-// router.post("/login", function(req,res){
-//   var username = req.body.username;
-//   var password = req.body.password;
-
-//   let loginquery = "SELECT * FROM users WHERE username = ?;";
-//   let vals = [username];
-
-//   con.query(loginquery, vals, function (sqlerr, result) {
-//     if (sqlerr) {
-//       res.status(500);
-//     } else {
-//       // console.log(result[0]);
-//       let hash = result[0].password;
-//       bcrypt.compare(password, hash, function (err, bres) {
-//         if (bres) {
-//           console.log("Valid login");
-//           var id_user = result[0].id_user;
-//           req.login(id_user, function (err) {
-//             //res.render('profile',{user: result});
-//           	console.log(req.user);
-//             res.redirect('/users/profile');
-//           });
-//         } else {
-//           console.log("Invalid login");
-//           res.redirect('/users/login');
-//         }
-//       });
-//     }
-//   });
-// });
-
 router.get("/start", (req,res)=>{
 	res.render('start');
+});
+
+router.post('/start', function(req, res) {
+	var pass = req.body.pass;
+
+	if(req.body.pass==req.body.passC && req.body.name!="" && req.body.email!=""){
+		//pass=req.body.pass;
+		//console.log("second");
+		
+
+		bcrypt.hash(pass, saltRounds, function(err, hash){
+
+			let sql = "INSERT INTO `Users`(`id_user`, `username`, `email`, `password`) VALUES (NULL, ?, ?, ?)";
+			var vals = [req.body.name, req.body.email, hash];
+
+			con.query(sql, vals, function(err, result)  {
+				if(err) throw err;
+				//console.log("user created");
+				let sql = "SELECT LAST_INSERT_ID() as id_user";
+
+				con.query(sql,(err,result)=>{
+					if(err)throw err;
+
+					var id_user = result[0];
+					console.log(result[0]);
+
+                  //LOGIN USER-create a session
+                  req.login(id_user,function(err){
+
+                     //res.redirect('/users/login');  
+
+                 });
+                  //chatkit begin
+                  const { username } = req.body
+                  chatkit.createUser({ 
+                  	id: req.body.email, 
+                  	name: req.body.name 
+                  })
+                  .then(() => res.sendStatus(201)).catch(error => {
+                  	if (error.error_type === 'services/chatkit/user_already_exists') {
+                  		//res.sendStatus(200)
+                  		console.log("user already exists")
+                  	} else {
+                  		//res.status(error.status).json(error)
+                  		console.log(error.status)
+                  		//this section still gives the catch error, dont know why, uncomment the res.status to see message
+                  	}
+                  	return null
+                  })
+                  //chatkit end
+              });
+			});
+			res.redirect("/users/login");
+		});
+	}
+	else
+		res.redirect("/users/start");
+});
+
+router.get("/chat", function(req,res){
+	findUserForChat(69);
+	res.render('chatkit');
 });
 
 router.get("/login", function(req,res){
@@ -288,5 +296,104 @@ router.post('/imginsert',multer({
          res.redirect('/users/profile');
         });
     });
+
+//THALES FUNCTIOS
+function findUserForChat(x)
+{
+	var fullTaglist=[];
+	var userTags=[];
+	var foundUser;
+
+	con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
+		userTags=result;
+		console.log(userTags);
+
+		if(userTags.length>0)//if above query returns that the user has tags
+		{
+			con.query("SELECT * FROM `taglist` WHERE `id_user`!="+x+" ORDER BY `id_user` ASC, `id_tag` ASC", function (err, result, fields) {
+				fullTaglist=result;
+				console.log(fullTaglist);
+				console.log(fullTaglist[0].id_user);
+				var idTracker=fullTaglist[0].id_user;
+				var match=0;
+				var match_list=[];
+
+				for(var a=0; a<fullTaglist.length; a++)//go through each element of the fullTaglist
+				{
+					//console.log("currentID " +fullTaglist[a].id_user + " tracker: " +idTracker);
+					if(fullTaglist[a].id_user==idTracker)//skipping over one match for some reason when switching id's
+					{
+						for(var z=0; z<userTags.length; z++)//check if current id matches with tags
+						{
+							if(fullTaglist[a].id_tag == userTags[z].id_tag)//if match, increase match
+							{
+								match++; 
+								console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
+							}
+						}
+						if(match==userTags.length)//if match with all, push this user into a matched array
+						{
+							match_list.push(fullTaglist[a].id_user);
+							console.log("pushed "+fullTaglist[a].id_user+" at if");
+							match=0;
+						}
+					}
+					else
+					{
+						idTracker=fullTaglist[a].id_user;
+						match=0;
+
+						if(fullTaglist[a].id_tag == userTags[0].id_tag)//if match, increase match
+						{
+							match++; 
+							console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
+						}
+						if(match==userTags.length)//if match with all, push this user into a matched array
+						{
+							match_list.push(fullTaglist[a].id_user);
+							console.log("pushed "+fullTaglist[a].id_user+" at else");
+							match=0;
+						}
+					}
+				}//end of top for
+
+				console.log(match_list);
+
+				foundUser = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
+				console.log("randomly chosen user: " +foundUser);
+
+				con.query("SELECT `email` FROM `users` WHERE `id_user`="+foundUser+"", function (err, result, fields) {
+					if (err) throw err;
+					console.log(result[0].email);//THIS RESULT HERE IS THE ID THAT NEEDS TO GET SENT TO NEXT FUNCTION
+					return result[0].email;
+				});
+
+				
+			});
+		}//end of if user has taglist>0
+		else//if the query returns that the user does not have tags in the list, doesnt work as it should.
+		{
+			
+			var list=[];
+			
+
+			con.query("SELECT * FROM `Users` WHERE `id_user`!="+x+"", function (err, result, fields) {
+				list=result;
+
+				foundUser = list[Math.floor(Math.random() * list.length)].email;//picks random user out of the list of matches
+				console.log("randomly chosen user: " +foundUser);
+
+				
+				return foundUser;
+			});
+		}
+	});
+}
+
+router.get('/randomUser', function(req,res){
+	//NEED TO GET THIS WORKING SO I CAN CALL IT THE CHATKIT.JADE AND USE IT TO ADD THE FOUND USER TO THE ROOM
+	//res.send(findUserForChat(69));
+	res.send("a@a.com");
+});
 
 module.exports = router; 
