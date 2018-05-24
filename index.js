@@ -15,7 +15,6 @@ var {con, options} = require('./db.js')
 var app = express();
 var sessionStore = new MySQLStore(options);
 
-app.use(express.static("node_modules/popper.js/dist"));
 app.use(express.static("node_modules/bootstrap/dist"));
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));

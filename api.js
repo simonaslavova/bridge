@@ -98,8 +98,7 @@ router.post('/start', function(req, res) {
 		res.redirect("/users/start");
 });
 
-router.get("/chat", function(req,res){
-	findUserForChat(69);
+router.get("/chat", authenticationMiddleware(), function(req,res){
 	res.render('chatkit');
 });
 
@@ -107,7 +106,25 @@ router.get("/login", function(req,res){
 	res.render('login');
 });
 
-
+router.get("/profile", authenticationMiddleware(), function(req,res){
+	console.log("Profile: ", req.user);
+	var id = req.user.id_user;
+	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
+	if (err) throw err;
+	console.log(result);
+		con.query("SELECT * FROM `taglist` WHERE  id_user = ?", id, function (err, bres , fields) {
+		if (err) throw err;
+		console.log(bres);
+		/*var id_tag = bres.id_tag;
+			con.query("SELECT * FROM `tags` WHERE id_tag = ?", id_tag, function (err, yes, fields){
+			if (err) throw err;
+			console.log(yes);
+			res.render('profile', {users: result, tags: yes});
+			});*/
+			res.render('profile', {users: result, tags: bres});
+		});
+	});
+});
 
 router.get("/logout", function(req,res){
 	req.logout();
@@ -118,11 +135,18 @@ router.get("/logout", function(req,res){
 
 
 router.get("/main", authenticationMiddleware(), function(req,res){
-		var user = req.user.id_user;
-		con.query("SELECT * FROM `Tags`", function (err, result, fields) {
+	//console.log("User: ", req.user);
+	res.render('main');
+	/*var tag = req.body.tag;
+	con.query("SELECT * FROM `Tags` WHERE tag_name = tag", tag, function (err, result, fields) {
 		if (err) throw err;
-		res.render('main', {tags: result});
-	});
+		//console.log(result);
+			con.query("SELECT * FROM `Users` WHERE id_user = id", function (err, bres , fields) {
+			if (err) throw err;
+			//console.log(bres);
+			res.render('main', {tags: result, users: bres});
+			});
+	});*/
 });
 
 router.get("/search", authenticationMiddleware(), function(req,res){
@@ -158,12 +182,11 @@ router.post('/tagToUser', authenticationMiddleware(), function(req, res, next) {
 });
 
 router.get("/submitTag", authenticationMiddleware(), function(req,res){
-	var id = req.user.id_user;
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
 		//console.log(result);
 		console.log("Profile:", req.user);
-		res.render('main', {tags: result});
+		res.render('submitTag', {tags: result});
 	});
 
 });
@@ -175,7 +198,7 @@ router.post("/submitTag", authenticationMiddleware(), function(req, res) {
 		if(err) throw err;
 		console.log("tag submit");
 	});
-	res.redirect("/users/main");
+	res.redirect("/users/submitTag");
 });
 //send text message to defined chat
 router.get('/messageToChat',function(req,res){
@@ -248,37 +271,11 @@ var storage = multer.diskStorage({
     }
 })
 
-router.get('/imginsert', authenticationMiddleware(), function(req,res){
-	res.redirect('/users/profile')
-	var id = req.user.id_user;
-	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
-	if (err) throw err;
-	res.send(result);
-	});
+router.get('/imginsert', function(req,res){
+	res.render('profile');
 });
 
-router.get("/profile", authenticationMiddleware(), function(req,res){
-	console.log("Profile: ", req.user);
-	var id = req.user.id_user;
-	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
-	if (err) throw err;
-	console.log(result);
-		con.query("SELECT * FROM `taglist` WHERE  id_user = ?", id, function (err, bres , fields) {
-		if (err) throw err;
-		console.log(bres);
-		/*var id_tag = bres.id_tag;
-			con.query("SELECT * FROM `tags` WHERE id_tag = ?", id_tag, function (err, yes, fields){
-			if (err) throw err;
-			console.log(yes);
-			res.render('profile', {users: result, tags: yes});
-			});*/
-			res.render('profile', {users: result, tags: bres});
-		});
-	});
-});
-
-
-router.post('/imginsert',authenticationMiddleware(), multer({
+router.post('/imginsert',multer({
     storage: storage,
     fileFilter: function(req, file, callback) {
         var ext = path.extname(file.originalname)
@@ -290,117 +287,23 @@ router.post('/imginsert',authenticationMiddleware(), multer({
     }
 }).single('file'), function(req, res) {
  /*img is the name that you define in the html input type="file" name="img" */       
- 		var id = req.user.id_user;
- 		console.log(req.file.path);
- 		
-        let sql = "UPDATE `Users` SET `profile_picture` = ('"+req.file.path+"') WHERE id_user= ? ";
-        var query = con.query(sql, id, function(err, rows)      
+
+        var query = con.query("INSERT INTO `Users`(`profile_picture`) WHERE `username`=`user.username` VALUES ('"+req.file.path+"')" ,function(err, rows)      
         {                                                      
           if (err)
             throw err;
+         res.redirect('/users/profile');
         });
-        res.redirect('/users/profile');
     });
 
 //THALES FUNCTIOS
-function findUserForChat(x)
-{
+router.get('/randomUser', authenticationMiddleware(), function(req,res){
+
+	var id =req.user.id_user;
 	var fullTaglist=[];
 	var userTags=[];
 	var foundUser;
-
-	con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
-		userTags=result;
-		console.log(userTags);
-
-		if(userTags.length>0)//if above query returns that the user has tags
-		{
-			con.query("SELECT * FROM `taglist` WHERE `id_user`!="+x+" ORDER BY `id_user` ASC, `id_tag` ASC", function (err, result, fields) {
-				fullTaglist=result;
-				console.log(fullTaglist);
-				console.log(fullTaglist[0].id_user);
-				var idTracker=fullTaglist[0].id_user;
-				var match=0;
-				var match_list=[];
-
-				for(var a=0; a<fullTaglist.length; a++)//go through each element of the fullTaglist
-				{
-					//console.log("currentID " +fullTaglist[a].id_user + " tracker: " +idTracker);
-					if(fullTaglist[a].id_user==idTracker)//skipping over one match for some reason when switching id's
-					{
-						for(var z=0; z<userTags.length; z++)//check if current id matches with tags
-						{
-							if(fullTaglist[a].id_tag == userTags[z].id_tag)//if match, increase match
-							{
-								match++; 
-								console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
-							}
-						}
-						if(match==userTags.length)//if match with all, push this user into a matched array
-						{
-							match_list.push(fullTaglist[a].id_user);
-							console.log("pushed "+fullTaglist[a].id_user+" at if");
-							match=0;
-						}
-					}
-					else
-					{
-						idTracker=fullTaglist[a].id_user;
-						match=0;
-
-						if(fullTaglist[a].id_tag == userTags[0].id_tag)//if match, increase match
-						{
-							match++; 
-							console.log("this id: "+idTracker+" matchTotal: "+ match +" tag Value: " +fullTaglist[a].id_tag);
-						}
-						if(match==userTags.length)//if match with all, push this user into a matched array
-						{
-							match_list.push(fullTaglist[a].id_user);
-							console.log("pushed "+fullTaglist[a].id_user+" at else");
-							match=0;
-						}
-					}
-				}//end of top for
-
-				console.log(match_list);
-
-				foundUser = match_list[Math.floor(Math.random() * match_list.length)];//picks random user out of the list of matches
-				console.log("randomly chosen user: " +foundUser);
-
-				con.query("SELECT `email` FROM `users` WHERE `id_user`="+foundUser+"", function (err, result, fields) {
-					if (err) throw err;
-					console.log("email to return: "+result[0].email);//THIS RESULT HERE IS THE ID THAT NEEDS TO GET SENT TO NEXT FUNCTION
-					return result[0].email;
-				});
-
-				
-			});
-		}//end of if user has taglist>0
-		else//if the query returns that the user does not have tags in the list, doesnt work as it should.
-		{
-			
-			var list=[];
-			
-
-			con.query("SELECT * FROM `Users` WHERE `id_user`!="+x+"", function (err, result, fields) {
-				list=result;
-
-				foundUser = list[Math.floor(Math.random() * list.length)].email;//picks random user out of the list of matches
-				console.log("randomly chosen user: " +foundUser);
-
-				
-				return foundUser;
-			});
-		}
-	});
-}
-
-router.get('/randomUser', function(req,res){
-
-	var fullTaglist=[];
-	var userTags=[];
-	var foundUser;
-	var x=69;
+	var x=id;
 
 	con.query("SELECT `id_tag` FROM `taglist` WHERE `id_user`="+x+"", function (err, result, fields) {
 		userTags=result;
@@ -489,4 +392,10 @@ router.get('/randomUser', function(req,res){
 
 });
 
+router.get('/whoLog', authenticationMiddleware(), function(req,res){
+	var loggedUserEmail =req.user.email;
+	res.send(loggedUserEmail);
+
+
+});
 module.exports = router; 

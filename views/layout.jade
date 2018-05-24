@@ -1,11 +1,9 @@
 html(lang='en')
 	head
 		meta(charset='UTF-8')
-		script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
-		script(src='/popper.min.js')
-		link(href='/css/bootstrap.min.css', rel='stylesheet', type='text/css')
 		link(href='/style.css', rel='stylesheet', type='text/css')
 		link(href='https://fonts.googleapis.com/css?family=Abril+Fatface|Playfair+Display|Quicksand|Raleway|Slabo+27px', rel='stylesheet')
+		script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
 	body
 		header
 			img(src='/LogoBridge.jpg', width='90', height='90')
@@ -13,5 +11,7 @@ html(lang='en')
 				ol
 					a(href='/users/main') Home
 					a(href='/users/profile') Profile
+					a(href='/users/submitTag') Tags
+					a(href='/users/chat') ChatKit
 					a(href='/users/logout') LogOut
-	block content 
+		block content 

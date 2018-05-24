@@ -2,19 +2,9 @@
     box-sizing: border-box;
 }
 
-content{
-    margin-top:0px;
-}
-
-fieldset{
-    width:200px;
-    height:200px;
-    font-size:30px;
-}
-
 html, body {
     height: 100%;
-    background-color: #ffb84d;
+    background-color:#ff9900;
     font-family: Quicksand;
     margin: 0;
     padding: 0;
@@ -23,19 +13,11 @@ html, body {
 header{
     margin: 0px 0px 0px 0px;
     background-color: white;
-    width:100%;
-    font-size: 40px;
 }
 
-p {
-    font-size: 20px;
+h1 {
+    font-size: 30px;
     font-family: Quicksand;
-}
-
-h1{
-    font-size: 40px;
-    font-family: Quicksand;
-    padding:0px;
 }
 
 h2 {
@@ -45,12 +27,10 @@ h2 {
 
 .main{
     margin-top: 0px;
-    margin-left: 0px;
-    margin-right: 0px;
-    background-image: url("happy.jpg");
-    font-family: Quicksand;  
-    height: 100%; 
-    width:100%;
+    margin-left: 250px;
+    margin-right: 250px;
+    background-color: #ff9900;
+    font-family: Quicksand;   
 }
 
 .links{
@@ -65,22 +45,18 @@ h2 {
 a:link{
     font-size: 20px;
     color:black; 
-    font-family:quicksand;
-    style: none;  
-    text-decoration: none;
+    font-family:quicksand;  
 }
 
 a:hover{
-    font-size: 20px;
-    background-color: #ffb84d;
-    color: white;
-    text-decoration: none;
+font-size: 30px;
+background-color:orange; 
+color: white;
 }
 
 a:visited{
     font-size: 20px;
     color: black;
-    text-decoration: none;
 }
 
 .rounded {
@@ -128,29 +104,29 @@ dialog {
 }
 
 #taglist{
-    padding:30px;
-    font-size: 15px; 
-    background-color: #fff5e6;
-    border: 1px solid black;
-    outline: #29a3a3 solid 5px;
-}
-
-#createTag{
-    margin-top:20px;
-    padding-top:30px;
-    padding:30px;
-    font-size: 15px; 
-    background-color: #fff5e6;
-    border: 1px solid black;
-    outline: #29a3a3 solid 5px;
+    margin-top: 50px;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding-left: 20px;
+    font-size: 15px;
+    width: 320px;
+    height: 600px;  
+    background-color: white;
+    border: 2px solid black;
+    outline: #29a3a3 solid 10px;
 }
 
 #tags{
+    margin-top: 100px;
+    margin-left: 600px;
+    margin-right: 50px;
     padding-left: 20px;
-    font-size: 15px; 
-    background-color: #fff5e6;
-    border: 1px solid black;
-    outline: #29a3a3 solid 5px;
+    font-size: 20px;
+    width: 700px;
+    height: 600px;  
+    background-color: white;
+    border: 2px solid black;
+    outline: #29a3a3 solid 10px;
 }
 
 #chatlist{
@@ -183,9 +159,10 @@ dialog {
 
 #bio{
     padding: 5px 10px 10px 10px;
-    width: 250px;
-    height: 120;
-    background-color:white;
+    margin-left: 900px;
+    width: 200px;
+    height: 90;
+    background-color:#ebfafa;
     float: right;
 }
 
@@ -194,10 +171,8 @@ dialog {
 }
 
 #profilepic{ 
-    margin-top:20px;
-    margin-bottom:20px;
-    width: 230px;
-    height: 230px;
+    width: 250px;
+    height: 250px;
     border-radius: 100%;
     background: #eee no-repeat center;
     background-size: cover;
@@ -210,9 +185,8 @@ dialog {
 	text-align: left;
 }
 
-#pic{
-    height:50px;
-    width:200px;
+#uploadpic{
+    margin-top:20px;
 }
 
 #message-text{
@@ -237,58 +211,4 @@ dialog {
     width: 800px;
     position: absolute;
     bottom: 0;
-}
-
-#banner{
-
-}
-
-#username{
-
-}
-
-
-#startchat{
-    margin-right: 1000px;
-    float: right;
-}
-
-input[type=submit] {
-    background-color: black;
-    font-color: white;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-#searchTag{
-    font-size: 20px;
-    padding: 10px;
-    width:120px;
-    height:40px;
-}
-
-input[type=submit]:hover {
-    font-color: black;
-    background-color: orange;
-}
-
-input[type=file] {
-    background-color: #eff5f5;
-    font-color: white;
-    color: white;
-    padding: 10px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 20px;
-    width:200px;
-}
-
-input[type=file]:hover {
-    font-color: black;
-    background-color: orange;
 }
