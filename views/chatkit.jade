@@ -9,6 +9,10 @@ block content
         form#message-form           
           input#message-text(type='text')      
           input#send(type='submit') 
+        form#roomChange
+          input(type='submit', value='next room', name='nextRoom')
+        form#createRandom
+          input(type='submit', value='randomChat', name='randomChat')
       script(src='https://unpkg.com/@pusher/chatkit@0.7.5/dist/web/chatkit.js')  
       script.
         const tokenProvider = new Chatkit.TokenProvider({
@@ -23,49 +27,83 @@ block content
             tokenProvider: tokenProvider
           });
 
-
-        var randomUser;
-        $.get('/users/randomUser').done(function(response) {
           randomUser = response;
           console.log(randomUser);
 
           chatManager.connect().then(currentUser => {
-            currentUser.createRoom({
-              name: 'foundChat',
-              private: true,
-               addUserIds:[currentUser.id, randomUser]
-             }).then(room => {
-              console.log(`Created room called ${room.name}`)
+            var roomToken=currentUser.rooms.length-2;
+
+            const roomChangeForm = document.getElementById("roomChange");
+            roomChangeForm.addEventListener("submit", e => {
+
+              e.preventDefault();
+              if(roomToken==currentUser.rooms.length-1)
+                roomToken=0;
+              else
+                roomToken++;
+
+              console.log("room token: "+roomToken);
+
               currentUser.subscribeToRoom({
-                roomId: room.id,
+                roomId: currentUser.rooms[roomToken].id,
                 hooks: {
                   onNewMessage: message => {
                     const ul = document.getElementById("message-list");
                     const li = document.createElement("li");
                     li.appendChild(
-                      document.createTextNode(`${message.sender.name}: ${message.text}`)
+                      document.createTextNode(`(${currentUser.rooms[roomToken].name}) ${message.sender.name}: ${message.text}`)
                       );
                     ul.appendChild(li);
+                    console.log("roomSubscribedTo: "+roomToken);
                   }
                 }
               });
-              const form = document.getElementById("message-form");
-              form.addEventListener("submit", e => {
-                e.preventDefault();
-                const input = document.getElementById("message-text");
-                currentUser.sendMessage({
-                  text: input.value,
-                  roomId: room.id
-                });
-                input.value = "";
+              
+            });
+
+            const newRoomForm = document.getElementById("createRandom");
+            newRoomForm.addEventListener("submit", e => {
+              console.log("create new room");
+              e.preventDefault();
+              var randomUser;
+              $.get('/users/randomUser').done(function(response) {
+                randomUser = response;
+
+                currentUser.createRoom({
+                  name: 'Random Chat For '+currentUser.id+" & "+randomUser,
+                  private: true,
+                  addUserIds: [currentUser.id, randomUser]
+                }).then(room => {
+                  console.log(`Created room called ${room.name}`)
+                })
+                .catch(err => {
+                  console.log(`Error creating room ${err}`)
+                })
+
+              }); //end of $.get
+
+            });
+
+
+
+            console.log(currentUser.rooms);
+
+            const form = document.getElementById("message-form");
+            form.addEventListener("submit", e => {
+              console.log("roomToken for sending: "+roomToken);
+              e.preventDefault();
+              const input = document.getElementById("message-text");
+              currentUser.sendMessage({
+                text: input.value,
+                roomId: currentUser.rooms[roomToken].id
               });
-            })
-             .catch(err => {
-              console.log(`Error creating room ${err}`)
-            })
+              input.value = "";
+            });
+
+
+
           })//end of chatmanager.connect  
           .catch(error => {
             console.error("error:", error);
           });
-        });
         });
