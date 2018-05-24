@@ -2,20 +2,36 @@ extends layout
 
 block content
 		.main
-			h1=req.user.id_user
-				br
-				br
-				img#profilepic
-			#bio
-				each item in users
-					p="Username: " + item.username
-					p="ID of the User: " + item.id_user
-					p=item.bio
-			#uploadpic
-				form(action='/users/imginsert', method='post', enctype='multipart/form-data')
-					input(type='file', name ='file', value='file')
-					input(type='submit', value='submit')
-			#tags
-				h2#navtitle My Tags
-				each item in tags
-					p=item.id_tag
+			.container
+				.row
+					.col-4
+						#profilepic
+					.col-4
+						#username
+							each item in users
+								h1=item.username
+					.col-4
+						#bio
+							each item in users
+								p="Username: " + item.username
+								p="ID of the User: " + item.id_user
+								p="Email: " + item.email
+			.container
+				.row
+					.col-6
+						#uploadpic
+							form(action='/users/imginsert', method='post', enctype='multipart/form-data')
+								input#pic(type='file', name ='file', value='file')
+								input#pic(type='submit', value='submit')
+					.col-6
+						#startchat
+								form(action='/users/chat')
+									input(type='submit', value='Start a chat')
+				.row
+					.col-12
+						#tags
+							h2#navtitle My Tags
+							each item in tags
+								p=item.id_tag
+
+				

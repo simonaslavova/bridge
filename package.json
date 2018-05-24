@@ -29,8 +29,10 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
+    "popper.js": "^1.14.3",
     "pusher": "^2.0.0",
     "pusher-chatkit-server": "^0.12.0",
+    "save": "^2.3.2",
     "session-memory-store": "^0.2.2"
   }
 }

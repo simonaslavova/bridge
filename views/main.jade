@@ -1,9 +1,39 @@
 extends layout
 
 block content
-	#taglist
-		h1 Select Tags:
-		input#tag(type='text', name='tag')
-		form(action='/users/search', method='post')
-			input(type='submit', value='Search')
+	.main
+		.container
+			.row
+				.col-6
+					#createTag 
+						h1 Create a Tag:
+						form(action='/users/submitTag', method='POST')
+							fieldset
+								field
+									p Tag: 
+									input#Tname(type='text', name='Tname')
+								field
+									p Category: 
+									input#Tcategory(type='text', name='Tcategory')
+							row
+									input#searchTag(type='submit', value='Create Tag')
+			.row
+				.col-12
+					br
+			.row
+				.col-12
+					br
+			.row
+				.col
+					#taglist
+						.container
+							h1 All Tags:
+							#results
+								each item in tags
+									p=" Name: " + item.tag_name + " Category: " + item.category
+										input(type='checkbox', name='tag', value='tag_name')
+							row
+								input#searchTag(type='submit', value='Add Tag') 
 
+
+				

@@ -107,25 +107,7 @@ router.get("/login", function(req,res){
 	res.render('login');
 });
 
-router.get("/profile", authenticationMiddleware(), function(req,res){
-	console.log("Profile: ", req.user);
-	var id = req.user.id_user;
-	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
-	if (err) throw err;
-	console.log(result);
-		con.query("SELECT * FROM `taglist` WHERE  id_user = ?", id, function (err, bres , fields) {
-		if (err) throw err;
-		console.log(bres);
-		/*var id_tag = bres.id_tag;
-			con.query("SELECT * FROM `tags` WHERE id_tag = ?", id_tag, function (err, yes, fields){
-			if (err) throw err;
-			console.log(yes);
-			res.render('profile', {users: result, tags: yes});
-			});*/
-			res.render('profile', {users: result, tags: bres});
-		});
-	});
-});
+
 
 router.get("/logout", function(req,res){
 	req.logout();
@@ -136,18 +118,11 @@ router.get("/logout", function(req,res){
 
 
 router.get("/main", authenticationMiddleware(), function(req,res){
-	//console.log("User: ", req.user);
-	res.render('main');
-	/*var tag = req.body.tag;
-	con.query("SELECT * FROM `Tags` WHERE tag_name = tag", tag, function (err, result, fields) {
+		var user = req.user.id_user;
+		con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
-		//console.log(result);
-			con.query("SELECT * FROM `Users` WHERE id_user = id", function (err, bres , fields) {
-			if (err) throw err;
-			//console.log(bres);
-			res.render('main', {tags: result, users: bres});
-			});
-	});*/
+		res.render('main', {tags: result});
+	});
 });
 
 router.get("/search", authenticationMiddleware(), function(req,res){
@@ -183,11 +158,12 @@ router.post('/tagToUser', authenticationMiddleware(), function(req, res, next) {
 });
 
 router.get("/submitTag", authenticationMiddleware(), function(req,res){
+	var id = req.user.id_user;
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
 		//console.log(result);
 		console.log("Profile:", req.user);
-		res.render('submitTag', {tags: result});
+		res.render('main', {tags: result});
 	});
 
 });
@@ -199,7 +175,7 @@ router.post("/submitTag", authenticationMiddleware(), function(req, res) {
 		if(err) throw err;
 		console.log("tag submit");
 	});
-	res.redirect("/users/submitTag");
+	res.redirect("/users/main");
 });
 //send text message to defined chat
 router.get('/messageToChat',function(req,res){
@@ -272,11 +248,37 @@ var storage = multer.diskStorage({
     }
 })
 
-router.get('/imginsert', function(req,res){
-	res.render('profile');
+router.get('/imginsert', authenticationMiddleware(), function(req,res){
+	res.redirect('/users/profile')
+	var id = req.user.id_user;
+	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
+	if (err) throw err;
+	res.send(result);
+	});
 });
 
-router.post('/imginsert',multer({
+router.get("/profile", authenticationMiddleware(), function(req,res){
+	console.log("Profile: ", req.user);
+	var id = req.user.id_user;
+	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
+	if (err) throw err;
+	console.log(result);
+		con.query("SELECT * FROM `taglist` WHERE  id_user = ?", id, function (err, bres , fields) {
+		if (err) throw err;
+		console.log(bres);
+		/*var id_tag = bres.id_tag;
+			con.query("SELECT * FROM `tags` WHERE id_tag = ?", id_tag, function (err, yes, fields){
+			if (err) throw err;
+			console.log(yes);
+			res.render('profile', {users: result, tags: yes});
+			});*/
+			res.render('profile', {users: result, tags: bres});
+		});
+	});
+});
+
+
+router.post('/imginsert',authenticationMiddleware(), multer({
     storage: storage,
     fileFilter: function(req, file, callback) {
         var ext = path.extname(file.originalname)
@@ -288,13 +290,16 @@ router.post('/imginsert',multer({
     }
 }).single('file'), function(req, res) {
  /*img is the name that you define in the html input type="file" name="img" */       
-
-        var query = con.query("INSERT INTO `Users`(`profile_picture`) WHERE `username`=`user.username` VALUES ('"+req.file.path+"')" ,function(err, rows)      
+ 		var id = req.user.id_user;
+ 		console.log(req.file.path);
+ 		
+        let sql = "UPDATE `Users` SET `profile_picture` = ('"+req.file.path+"') WHERE id_user= ? ";
+        var query = con.query(sql, id, function(err, rows)      
         {                                                      
           if (err)
             throw err;
-         res.redirect('/users/profile');
         });
+        res.redirect('/users/profile');
     });
 
 //THALES FUNCTIOS
