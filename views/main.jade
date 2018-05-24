@@ -30,7 +30,7 @@ block content
 							h1 All Tags:
 							#results
 								each item in tags
-									p=" Name: " + item.tag_name + " Category: " + item.category
+									p=" Tag: " + item.tag_name + " Category: " + item.category
 										input(type='checkbox', name='tag', value='tag_name')
 							row
 								input#searchTag(type='submit', value='Add Tag') 

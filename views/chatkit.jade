@@ -2,17 +2,24 @@ extends layout
 
 block content
   .main
-    .chat
-      fieldset#first
-        fieldset#second
-          ul#message-list      
-        form#message-form           
-          input#message-text(type='text')      
-          input#send(type='submit') 
-        form#roomChange
-          input(type='submit', value='next room', name='nextRoom')
-        form#createRandom
-          input(type='submit', value='randomChat', name='randomChat')
+      .container
+        .row
+          .col-sm-12
+            fieldset#first
+              fieldset#second
+                ul#message-list 
+            fieldset#second     
+              form#message-form           
+                input#message-text(type='text')      
+                input#send(type='submit') 
+              .row
+                .col-sm-4
+                    form#roomChange
+                      input(type='submit', value='next room', name='nextRoom')
+                .col-sm-4
+                    form#createRandom
+                      input(type='submit', value='randomChat', name='randomChat')
+                .col-sm-4
       script(src='https://unpkg.com/@pusher/chatkit@0.7.5/dist/web/chatkit.js')  
       script.
         const tokenProvider = new Chatkit.TokenProvider({
