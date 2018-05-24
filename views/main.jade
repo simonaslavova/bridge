@@ -1,6 +1,7 @@
 extends layout
 
 block content
+<<<<<<< HEAD
 	.main
 		.container
 			.row
@@ -34,6 +35,11 @@ block content
 										input(type='checkbox', name='tag', value='tag_name')
 							row
 								input#searchTag(type='submit', value='Add Tag') 
+=======
+	#taglist
+		h1 Select Tags:
+		input#tag(type='text', name='tag')
+		form(action='/users/search', method='post')
+			input(type='submit', value='Search')
+>>>>>>> 8f0b84af3c4cebed0307c9e454800cb320a454b7
 
-
-				

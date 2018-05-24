@@ -2,6 +2,7 @@ extends layout
 
 block content
 		.main
+<<<<<<< HEAD
 			.container
 				.row
 					.col-sm-4
@@ -34,3 +35,22 @@ block content
 							h2#navtitle My Tags
 							each item in tags
 								p=item.id_tag
+=======
+			h1=req.user.id_user
+				br
+				br
+				img#profilepic
+			#bio
+				each item in users
+					p="Username: " + item.username
+					p="ID of the User: " + item.id_user
+					p=item.bio
+			#uploadpic
+				form(action='/users/imginsert', method='post', enctype='multipart/form-data')
+					input(type='file', name ='file', value='file')
+					input(type='submit', value='submit')
+			#tags
+				h2#navtitle My Tags
+				each item in tags
+					p=item.id_tag
+>>>>>>> 8f0b84af3c4cebed0307c9e454800cb320a454b7

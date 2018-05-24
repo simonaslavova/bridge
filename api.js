@@ -98,7 +98,11 @@ router.post('/start', function(req, res) {
 		res.redirect("/users/start");
 });
 
+<<<<<<< HEAD
 router.get("/chat", function(req,res){
+=======
+router.get("/chat", authenticationMiddleware(), function(req,res){
+>>>>>>> 8f0b84af3c4cebed0307c9e454800cb320a454b7
 	res.render('chatkit');
 });
 
@@ -106,7 +110,25 @@ router.get("/login", function(req,res){
 	res.render('login');
 });
 
-
+router.get("/profile", authenticationMiddleware(), function(req,res){
+	console.log("Profile: ", req.user);
+	var id = req.user.id_user;
+	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
+	if (err) throw err;
+	console.log(result);
+		con.query("SELECT * FROM `taglist` WHERE  id_user = ?", id, function (err, bres , fields) {
+		if (err) throw err;
+		console.log(bres);
+		/*var id_tag = bres.id_tag;
+			con.query("SELECT * FROM `tags` WHERE id_tag = ?", id_tag, function (err, yes, fields){
+			if (err) throw err;
+			console.log(yes);
+			res.render('profile', {users: result, tags: yes});
+			});*/
+			res.render('profile', {users: result, tags: bres});
+		});
+	});
+});
 
 router.get("/logout", function(req,res){
 	req.logout();
@@ -117,11 +139,18 @@ router.get("/logout", function(req,res){
 
 
 router.get("/main", authenticationMiddleware(), function(req,res){
-		var user = req.user.id_user;
-		con.query("SELECT * FROM `Tags`", function (err, result, fields) {
+	//console.log("User: ", req.user);
+	res.render('main');
+	/*var tag = req.body.tag;
+	con.query("SELECT * FROM `Tags` WHERE tag_name = tag", tag, function (err, result, fields) {
 		if (err) throw err;
-		res.render('main', {tags: result});
-	});
+		//console.log(result);
+			con.query("SELECT * FROM `Users` WHERE id_user = id", function (err, bres , fields) {
+			if (err) throw err;
+			//console.log(bres);
+			res.render('main', {tags: result, users: bres});
+			});
+	});*/
 });
 
 router.get("/search", authenticationMiddleware(), function(req,res){
@@ -157,12 +186,11 @@ router.post('/tagToUser', authenticationMiddleware(), function(req, res, next) {
 });
 
 router.get("/submitTag", authenticationMiddleware(), function(req,res){
-	var id = req.user.id_user;
 	con.query("SELECT * FROM `Tags`", function (err, result, fields) {
 		if (err) throw err;
 		//console.log(result);
 		console.log("Profile:", req.user);
-		res.render('main', {tags: result});
+		res.render('submitTag', {tags: result});
 	});
 
 });
@@ -174,7 +202,7 @@ router.post("/submitTag", authenticationMiddleware(), function(req, res) {
 		if(err) throw err;
 		console.log("tag submit");
 	});
-	res.redirect("/users/main");
+	res.redirect("/users/submitTag");
 });
 //send text message to defined chat
 router.get('/messageToChat',function(req,res){
@@ -247,37 +275,11 @@ var storage = multer.diskStorage({
     }
 })
 
-router.get('/imginsert', authenticationMiddleware(), function(req,res){
-	res.redirect('/users/profile')
-	var id = req.user.id_user;
-	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
-	if (err) throw err;
-	res.send(result);
-	});
+router.get('/imginsert', function(req,res){
+	res.render('profile');
 });
 
-router.get("/profile", authenticationMiddleware(), function(req,res){
-	console.log("Profile: ", req.user);
-	var id = req.user.id_user;
-	con.query("SELECT * FROM `Users` WHERE id_user = ?", id, function (err, result , fields) {
-	if (err) throw err;
-	console.log(result);
-		con.query("SELECT * FROM `taglist` WHERE  id_user = ?", id, function (err, bres , fields) {
-		if (err) throw err;
-		console.log(bres);
-		/*var id_tag = bres.id_tag;
-			con.query("SELECT * FROM `tags` WHERE id_tag = ?", id_tag, function (err, yes, fields){
-			if (err) throw err;
-			console.log(yes);
-			res.render('profile', {users: result, tags: yes});
-			});*/
-			res.render('profile', {users: result, tags: bres});
-		});
-	});
-});
-
-
-router.post('/imginsert',authenticationMiddleware(), multer({
+router.post('/imginsert',multer({
     storage: storage,
     fileFilter: function(req, file, callback) {
         var ext = path.extname(file.originalname)
@@ -289,20 +291,20 @@ router.post('/imginsert',authenticationMiddleware(), multer({
     }
 }).single('file'), function(req, res) {
  /*img is the name that you define in the html input type="file" name="img" */       
- 		var id = req.user.id_user;
- 		console.log(req.file.path);
- 		
-        let sql = "UPDATE `Users` SET `profile_picture` = ('"+req.file.path+"') WHERE id_user= ? ";
-        var query = con.query(sql, id, function(err, rows)      
+
+        var query = con.query("INSERT INTO `Users`(`profile_picture`) WHERE `username`=`user.username` VALUES ('"+req.file.path+"')" ,function(err, rows)      
         {                                                      
           if (err)
             throw err;
+         res.redirect('/users/profile');
         });
-        res.redirect('/users/profile');
     });
 
 //THALES FUNCTIOS
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8f0b84af3c4cebed0307c9e454800cb320a454b7
 router.get('/randomUser', authenticationMiddleware(), function(req,res){
 
 	var id =req.user.id_user;
@@ -404,5 +406,9 @@ router.get('/whoLog', authenticationMiddleware(), function(req,res){
 
 
 });
+<<<<<<< HEAD
 
 module.exports = router; 
+=======
+module.exports = router; 
+>>>>>>> 8f0b84af3c4cebed0307c9e454800cb320a454b7

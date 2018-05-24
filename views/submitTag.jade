@@ -1,18 +1,14 @@
 extends layout
 
 block content
-	.main
-		#createTag 
-			form(action='/users/submitTag', method='POST')
-				fieldset
-					field#tagname
-						label(for='Tname') Tag: 
-						input#Tname(type='text', name='Tname')
-					br
-					field#tagcategory
-						label(for='Tcategory') Category: 
-						input#Tcategory(type='text', name='Tcategory')
-					br
-					field 
-						input#searchTag(type='submit', value='create tag')
-						
+	form(action='/users/submitTag', method='POST')
+			fieldset
+				.field
+					label(for='Tname') Tag: 
+					input#Tname(type='text', name='Tname')
+				.field
+					label(for='Tcategory') Category: 
+					input#Tcategory(type='text', name='Tcategory')
+				.field
+					input(type='submit', value='create tag')
+					
